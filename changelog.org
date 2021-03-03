@@ -1,0 +1,11 @@
+* Changelog
+** [Unreleased]
+*** Added
+- Repository erstellen
+- Professor zum Repository eingeladen
+- Altes Projekt hinzugefügt
+- Leere doc Datei erstellen
+- gitignore Datei angepasst
+*** Changed
+*** Removed
+** [0.0.1] - 2021-03-01
