@@ -4,6 +4,7 @@
  * Desc: Implementation of Street class
  * */
 
+#include <asio.hpp>
 #include "street.h"
 #include "util.h"
 #include "rang.hpp"
