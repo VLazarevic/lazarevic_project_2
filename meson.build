@@ -45,7 +45,7 @@ inc_dir = include_directories('include')
 src = ['src/main.cpp', 'src/trafficlight.cpp', 'src/util.cpp', 'src/car.cpp', 'src/street.cpp']
 #protobuf: src = ['src/main.cpp', generated]
 
-executable('project',
+executable('trafficlight-sim',
            sources : src,
            include_directories : inc_dir,
            dependencies : [thread_dep]
