@@ -30,7 +30,7 @@ public:
         this->licensePlate = licensePlate;
         this->speed = speed;
 }
-    nlohmann::json buildFromJSON(nlohmann::json json);
+
     std::string getLicensePlate();
     std::string getName();
     int getSpeed();

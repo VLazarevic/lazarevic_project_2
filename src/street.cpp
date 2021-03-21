@@ -35,6 +35,10 @@ nlohmann::json getJSON(Car tempCar) {
     return json;
 }
 
+nlohmann::json buildFromJSON(nlohmann::json json) {
+    return json;
+}
+
 //checking which sides are green to let the cars drive
 void Street::startStreet() {
     fillCarQueue();
@@ -129,7 +133,7 @@ void Street::fillCarQueue() {
 
         nlohmann::json carJSON = nlohmann::json::parse(save);
 
-        //newCar.buildFromJSON(carJSON);
+        buildFromJSON(carJSON);
     }
 
     logger("Cars are pushed in the queue");

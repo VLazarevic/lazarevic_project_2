@@ -69,7 +69,5 @@ int Car::getSpeed() {
     return this->speed;
 }
 
-nlohmann::json buildFromJSON(nlohmann::json json) {
-    return json;
-}
+
 
