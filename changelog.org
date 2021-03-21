@@ -8,4 +8,23 @@
 - gitignore Datei angepasst
 *** Changed
 *** Removed
-** [0.0.1] - 2021-03-01
+
+** [0.1] - 2021-03-01
+*** Added
+- build
+- Asio library
+- JSON library
+*** Changed
+- meson.build
+- meson_options.txt
+- car.h
+- car.cpp
+- street.cpp
+*** Removed
+- CLI11.hpp
+- rang.hpp
+
+** [0.2] - 2021-03-15
+*** Added
+*** Changed
+*** Removed

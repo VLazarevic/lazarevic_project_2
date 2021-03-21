@@ -10,6 +10,7 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <json.hpp>
 
 using namespace std;
 
@@ -31,6 +32,9 @@ string random_string( size_t length )
 
 //generate the car, with the attributes: name, licensePlate, speed
 Car Car::generateCar() {
+
+    // Read from JSON
+
     random_device randomDevice;
     mt19937 gen{randomDevice()};
     
@@ -64,3 +68,8 @@ std::string Car::getName() {
 int Car::getSpeed() {
     return this->speed;
 }
+
+nlohmann::json buildFromJSON(nlohmann::json json) {
+    return json;
+}
+
