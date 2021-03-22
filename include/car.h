@@ -17,7 +17,7 @@ private:
     std::string licensePlate;
     int speed;
 public:
-    static Car generateCar();
+    static nlohmann::json generateCar(int amount);
     
     Car() {
         this->name = "";

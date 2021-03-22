@@ -36,3 +36,6 @@
 
 # MacOsTrash
 .DS_Store
+
+#Visual Studio Code
+.vscode

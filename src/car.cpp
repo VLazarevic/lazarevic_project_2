@@ -5,6 +5,7 @@
  * */
 
 #include "car.h"
+#include <fstream>
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -31,30 +32,52 @@ string random_string( size_t length )
 }
 
 //generate the car, with the attributes: name, licensePlate, speed
-Car Car::generateCar() {
+nlohmann::json Car::generateCar(int amount) {
 
-    // Read from JSON
+    // JSON
+    nlohmann::json cars = {};
 
-    random_device randomDevice;
-    mt19937 gen{randomDevice()};
-    
-    vector<string> districtTypes = {"AM", "BN", "BL", "GD", "GF", "HL", "HO", "KO", "KR", "KS", "LF", "MD", "ME", "MI", "NK", "P", "SP", 
-                                    "SB", "SW", "TU", "WN", "WB", "WT", "WY", "ZT"};
-    uniform_real_distribution<> dis{0, (double) districtTypes.size()};
+    for(int i{0}; i < amount; i++) {
+        nlohmann::json car;
+        random_device randomDevice;
+        mt19937 gen{randomDevice()};
+        
+        vector<string> districtTypes = {"AM", "BN", "BL", "GD", "GF", "HL", "HO", "KO", "KR", "KS", "LF", "MD", "ME", "MI", "NK", "P", "SP", 
+                                        "SB", "SW", "TU", "WN", "WB", "WT", "WY", "ZT"};
+        uniform_real_distribution<> dis{0, (double) districtTypes.size()};
 
-    string licensePlate = districtTypes[(int) dis(gen)] + "-" + random_string(5);
+        string licensePlate = districtTypes[(int) dis(gen)] + "-" + random_string(5);
 
-    vector<string> carTypes = {"BMW", "VW", "AUDI", "MERCEDES", "PORSCHE", "OPEL", "NISSAN", "MAZDA", "TOYOTA", "HONDA", "PEUGEOT"};
+        vector<string> carTypes = {"BMW", "VW", "AUDI", "MERCEDES", "PORSCHE", "OPEL", "NISSAN", "MAZDA", "TOYOTA", "HONDA", "PEUGEOT"};
 
-    uniform_real_distribution<> dis_2{0, (double) carTypes.size()};
-    string name = carTypes[(int) dis_2(gen)];
+        uniform_real_distribution<> dis_2{0, (double) carTypes.size()};
+        string name = carTypes[(int) dis_2(gen)];
 
-    // miliseconds
-    uniform_real_distribution<> dis_3{1000, 2500};
+        // miliseconds
+        uniform_real_distribution<> dis_3{1000, 2500};
 
-    int speed = (int) dis_3(gen);
+        int speed = (int) dis_3(gen);
+        car["name"] = name;
+        car["licensePlate"] = licensePlate;
+        car["speed"] = speed;
 
-    return Car(name, licensePlate, speed);
+        cars.push_back(car);
+    }
+
+
+    fstream carStream;
+
+    // Clearing file
+    carStream.open("../doc/json/cars.json", std::ofstream::out | std::ofstream::trunc);
+    carStream.close();
+
+    carStream.open("../doc/json/cars.json");
+
+    carStream << cars;
+
+    carStream.close();
+
+    return cars;
 }
 
 std::string Car::getLicensePlate() {

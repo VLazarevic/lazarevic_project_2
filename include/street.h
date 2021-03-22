@@ -21,11 +21,15 @@ private:
     TrafficLight* light;
     Directions direction;
     int generateAmount;
+    int carAmount;
     std::queue<Car>* carQueue = new std::queue<Car>();
 public:
-    Street(int generateAmount, TrafficLight* light, Directions direction);
+    Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount);
     void startStreet();
-    void fillCarQueue();
+    void fillCarQueue(int amount);
+    int getCarAmount() {
+        return this->carAmount;
+    }
 
     inline std::string getCurrentTime(std::string s){
             time_t now = time(0);

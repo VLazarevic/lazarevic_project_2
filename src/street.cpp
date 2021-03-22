@@ -20,10 +20,11 @@ using namespace rang;
 bool isFirstStreet = true;
 
 //Street constructor
-Street::Street(int generateAmount, TrafficLight* light, Directions direction) {
+Street::Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount) {
     this->light = light;
     this->direction = direction;
     this->generateAmount = generateAmount;
+    this->carAmount = carAmount;
 }
 
 nlohmann::json getJSON(Car tempCar) {
@@ -35,41 +36,42 @@ nlohmann::json getJSON(Car tempCar) {
     return json;
 }
 
-nlohmann::json buildFromJSON(nlohmann::json json) {
-    return json;
+Car buildFromJSON(nlohmann::json json) {
+    Car newCar(json["name"], json["licensePlate"], json["speed"]);
+
+    return newCar;
 }
 
 //checking which sides are green to let the cars drive
 void Street::startStreet() {
-    fillCarQueue();
+    fillCarQueue(getCarAmount());
     while(true) {
         if(!carQueue->empty()) {
 
             
-
             // send cars to next street => sender street
             try {
                 
                 //asio definiton
-
+            
                 asio::io_context ioCtx;
 
-                string host = "187.0.0.1";
-                string port = "50000";
+                string host = "127.0.0.1";
+                string port = "10127";
 
                 asio::ip::tcp::resolver resolver(ioCtx.get_executor());
                 asio::ip::basic_resolver_results endpoint = resolver.resolve(host, port);
 
-                asio::ip::tcp::socket socket(ioCtx);
-                asio::connect(socket, endpoint);
+                // asio::ip::tcp::socket socket(ioCtx);
+                // asio::connect(socket, endpoint);
 
-                asio::streambuf sender;
-                ostream send_stream(&sender);
+                //asio::streambuf sender;
+                //ostream send_stream(&sender);
+            
+     
 
                 if((this->direction == WEST || this->direction == EAST) && this->light->getWestEastColor() == GREEN) {
                 Car nextCar = carQueue->front();
-
-                
 
                 if(this->direction == WEST)
                     println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "WEST", style::reset);
@@ -84,62 +86,71 @@ void Street::startStreet() {
                     else
                         println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
                     this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
-
+                    
                     //sending car item
                     Car tempCar = carQueue->front();
                     string carJSON = getJSON(tempCar).dump();
 
-                    send_stream << carJSON;
+                    //send_stream << carJSON;
 
+                    cout << carJSON;
+                    
                     carQueue->pop();
 
                 }
 
-                write(socket, sender);
-            } catch(exception e) {
-                println("error");
+                //write(socket, sender);
+                //socket.close();
+            } catch(exception& e) {
+                println(e.what());
             }
         }
     }   
 }
 
 //like the function name says it fills the car queue
-void Street::fillCarQueue() {
+void Street::fillCarQueue(int amount) {
     // receive cars, fill queue => receiver
 
     if(isFirstStreet) {
-        // getCarsFromJSON();
+        nlohmann::json cars = Car::generateCar(amount);
+
+        logger("Cars are pushed in the queue");
+        for(int i{0}; i < amount; i++) {
+            Car tmpCar(cars[i]["name"], cars[i]["licensePlate"], cars[i]["speed"]);
+            carQueue->push(tmpCar);
+        }   
+
         isFirstStreet = false;
     } else {
         asio::io_context ioCtx;
 
-        string host = "187.0.0.1";
-        string port = "50000";
+        string host = "127.0.0.1";
+        string port = "10127";
 
         asio::ip::tcp::resolver resolver(ioCtx.get_executor());
         asio::ip::basic_resolver_results endpoint = resolver.resolve(host, port);
 
-        asio::ip::tcp::socket socket(ioCtx);
-        asio::connect(socket, endpoint);
+        // asio::ip::tcp::socket socket(ioCtx);
+        // asio::connect(socket, endpoint);
 
-        asio::streambuf receiver;
-        istream receiver_stream(&receiver);
+        // asio::streambuf receiver;
+        // istream receiver_stream(&receiver);
 
-        Car newCar;
+        //Car newCar;
         
 
-        string save;
-        receiver_stream >> save;
+        //string save;
+        //receiver_stream >> save;
 
-        nlohmann::json carJSON = nlohmann::json::parse(save);
+        //nlohmann::json carJSON = nlohmann::json::parse(save);
 
-        buildFromJSON(carJSON);
+        //newCar = buildFromJSON(carJSON);
+
+        //carQueue->push(newCar);
     }
 
-    logger("Cars are pushed in the queue");
-    for(int i{0}; i < this->generateAmount; i++) {
-        carQueue->push(Car::generateCar());
-    }
+    
 }
 
 void getCarsFromJSON() {
