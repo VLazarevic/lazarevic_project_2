@@ -23,7 +23,10 @@ private:
     int generateAmount;
     int carAmount;
     std::queue<Car>* carQueue = new std::queue<Car>();
+
+    
 public:
+    static short portInc;
     Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount);
     void startStreet();
     void fillCarQueue(int amount);
