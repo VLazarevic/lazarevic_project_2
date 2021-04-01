@@ -25,7 +25,7 @@ Street::Street(int generateAmount, TrafficLight* light, Directions direction, in
     this->generateAmount = generateAmount;
     this->carAmount = carAmount;
 }
-
+/*
 short Street::portInc = 1;
 
 
@@ -43,14 +43,14 @@ Car buildFromJSON(nlohmann::json json) {
 
     return newCar;
 }
-
+*/
 //checking which sides are green to let the cars drive
 void Street::startStreet() {
     fillCarQueue(getCarAmount());
     while(true) {
         if(!carQueue->empty()) {
 
-            
+            /*
             // send cars to next street => sender street
             try {
                     asio::io_context ioCtx;
@@ -66,7 +66,7 @@ void Street::startStreet() {
                     asio::connect(socket, endpoint);
 
                     asio::streambuf sender;
-                    ostream send_stream(&sender);
+                    ostream send_stream(&sender);*/
 
                 if((this->direction == WEST || this->direction == EAST) && this->light->getWestEastColor() == GREEN) {
                 Car nextCar = carQueue->front();
@@ -85,7 +85,7 @@ void Street::startStreet() {
                     else
                         println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
                     this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
-                    
+                    /*
                     //sending car item
                     Car tempCar = carQueue->front();
                     string carJSON = getJSON(tempCar).dump();
@@ -96,14 +96,14 @@ void Street::startStreet() {
 
                     write(socket, sender);
                     socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-                    socket.close();
+                    socket.close();*/
                 }
 
                 
-
+/*
             } catch(exception& e) {
                 println(e.what());
-            }
+            }*/
         }
     }   
 }
@@ -133,7 +133,8 @@ void _send(asio::ip::tcp::socket &socket, const string& message) {
 //like the function name says it fills the car queue
 void Street::fillCarQueue(int amount) {
     // receive cars, fill queue => receiver
-    if(isFirstStreet) {
+    /*
+    if(isFirstStreet) {*/
         nlohmann::json cars = Car::generateCar(amount);
 
         logger("Cars are pushed in the queue");
@@ -141,7 +142,7 @@ void Street::fillCarQueue(int amount) {
             Car tmpCar(cars[i]["name"], cars[i]["licensePlate"], cars[i]["speed"]);
             carQueue->push(tmpCar);
         }   
-
+/*
         isFirstStreet = false;
     } else {
 
@@ -184,7 +185,7 @@ void Street::fillCarQueue(int amount) {
         }
 
         
-    }
+    }*/
     
     
 }

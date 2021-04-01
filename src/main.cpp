@@ -37,38 +37,62 @@ int main(int argc, char* argv[]) {
     CLI11_PARSE(app, argc, argv);
     
     //set the trafficlight
-    TrafficLight* light = new TrafficLight();
+    TrafficLight* trafficLight1 = new TrafficLight();
+    TrafficLight* trafficLight2 = new TrafficLight();
+    
     //set the streets
-    Street* north = new Street(amount, light, NORTH, carAmount);
-    Street* east = new Street(amount, light, EAST, carAmount);
-    Street* south = new Street(amount, light, SOUTH, carAmount);
-    Street* west = new Street(amount, light, WEST, carAmount);
+    Street* t1North = new Street(amount, trafficLight1, NORTH, carAmount);
+    Street* t1East = new Street(amount, trafficLight1, EAST, carAmount);
+    Street* t1South = new Street(amount, trafficLight1, SOUTH, carAmount);
+    Street* t1West = new Street(amount, trafficLight1, WEST, carAmount);
+
+    Street* t2North = new Street(amount, trafficLight2, NORTH, carAmount);
+    Street* t2East = new Street(amount, trafficLight2, EAST, carAmount);
+    Street* t2South = new Street(amount, trafficLight2, SOUTH, carAmount);
+    Street* t2West = new Street(amount, trafficLight2, WEST, carAmount);
+
 
     // https://thispointer.com/c11-start-thread-by-member-function-with-arguments/
     //defining the threads
-    thread lightThread(&TrafficLight::startTrafficLight, light);
-    thread northStreet(&Street::startStreet, north);
-    thread eastStreet(&Street::startStreet, east);
-    thread southStreet(&Street::startStreet, south);
-    thread westStreet(&Street::startStreet, west);
+    thread t1Thread(&TrafficLight::startTrafficLight, trafficLight1);
+    thread t1NorthStreet(&Street::startStreet, t1North);
+    thread t1EastStreet(&Street::startStreet, t1East);
+    thread t1SouthStreet(&Street::startStreet, t1South);
+    thread t1WestStreet(&Street::startStreet, t1West);
 
-    //define the thread how is going to fill the queue
+    thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
+    thread t2NorthStreet(&Street::startStreet, t2North);
+    thread t2EastStreet(&Street::startStreet, t2East);
+    thread t2SouthStreet(&Street::startStreet, t2South);
+    thread t2WestStreet(&Street::startStreet, t2West);
+
+
+    //define the thread which is going to fill the queue
     thread carFiller([&]() {
         while(true) {
-            north->fillCarQueue(carAmount);
-            east->fillCarQueue(carAmount);
-            south->fillCarQueue(carAmount);
-            west->fillCarQueue(carAmount);
+            t1North->fillCarQueue(carAmount);
+            t1East->fillCarQueue(carAmount);
+            //t1South->fillCarQueue(carAmount);
+            t1West->fillCarQueue(carAmount);
+            //t2North->fillCarQueue(carAmount);
+            t2East->fillCarQueue(carAmount);
+            t2South->fillCarQueue(carAmount);
+            t2West->fillCarQueue(carAmount);
             this_thread::sleep_for(chrono::milliseconds(respawnTime * 1000));
         }
     });
 
     //Starting the threads
-    lightThread.join();
-    northStreet.join();
-    eastStreet.join();
-    southStreet.join();
-    westStreet.join();
+    t1Thread.join();
+    t1NorthStreet.join();
+    t1EastStreet.join();
+    t1SouthStreet.join();
+    t1WestStreet.join();
+    t2Thread.join()
+    t2NorthStreet.join();
+    t2EastStreet.join();
+    t2SouthStreet.join();
+    t2WestStreet.join();
     carFiller.join();
 
     return 0;
