@@ -12,7 +12,7 @@
 <hr> 
 
 <p align="center">
-  <a class="bg-yellow" href="#open_book-about">About</a> |
+  <a href="#open_book-about">About</a> &#xa0; | &#xa0;
   <a href="#desktop_computer-technologies">Technologies</a> &#xa0; | &#xa0;
   <a href="#gear-requirements">Requirements</a> &#xa0; | &#xa0;
   <a href="#arrow_forward-execution">Execution</a> &#xa0; | &#xa0;
