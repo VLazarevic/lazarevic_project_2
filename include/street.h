@@ -22,12 +22,14 @@ private:
     Directions direction;
     int generateAmount;
     int carAmount;
+    unsigned short port;
+    unsigned short receiverPort;
     std::queue<Car>* carQueue = new std::queue<Car>();
 
     
 public:
     static short portInc;
-    Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount);
+    Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount, unsigned short port = 0, unsigned short receiverPort = 0);
     void startStreet();
     void fillCarQueue(int amount);
     int getCarAmount() {

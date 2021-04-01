@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
     //set the streets
     Street* t1North = new Street(amount, trafficLight1, NORTH, carAmount);
     Street* t1East = new Street(amount, trafficLight1, EAST, carAmount);
-    Street* t1South = new Street(amount, trafficLight1, SOUTH, carAmount);
+    Street* t1South = new Street(amount, trafficLight1, SOUTH, carAmount, 47500, 47501);
     Street* t1West = new Street(amount, trafficLight1, WEST, carAmount);
 
-    Street* t2North = new Street(amount, trafficLight2, NORTH, carAmount);
+    Street* t2North = new Street(amount, trafficLight2, NORTH, carAmount, 47501, 47500);
     Street* t2East = new Street(amount, trafficLight2, EAST, carAmount);
     Street* t2South = new Street(amount, trafficLight2, SOUTH, carAmount);
     Street* t2West = new Street(amount, trafficLight2, WEST, carAmount);
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     t1EastStreet.join();
     t1SouthStreet.join();
     t1WestStreet.join();
-    t2Thread.join()
+    t2Thread.join();
     t2NorthStreet.join();
     t2EastStreet.join();
     t2SouthStreet.join();
