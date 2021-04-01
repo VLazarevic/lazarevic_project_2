@@ -16,7 +16,7 @@
 using namespace std;
 using namespace rang;
 
-bool isFirstStreet = true;
+
 
 //Street constructor
 Street::Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort)
@@ -30,9 +30,10 @@ Street::Street(int generateAmount, TrafficLight *light, Directions direction, in
 }
 /*
 short Street::portInc = 1;
+*/
 
-
-nlohmann::json getJSON(Car tempCar) {
+nlohmann::json getJSON(Car tempCar)
+{
     nlohmann::json json;
     json["name"] = tempCar.getName();
     json["licensePlate"] = tempCar.getLicensePlate();
@@ -41,15 +42,35 @@ nlohmann::json getJSON(Car tempCar) {
     return json;
 }
 
-Car buildFromJSON(nlohmann::json json) {
+Car buildFromJSON(nlohmann::json json)
+{
     Car newCar(json["name"], json["licensePlate"], json["speed"]);
 
     return newCar;
 }
-*/
+
+string _read(asio::ip::tcp::socket &socket)
+{
+    asio::streambuf buf;
+    asio::read_until(socket, buf, "\n");
+
+    while (asio::read(socket, buf,
+                      asio::transfer_at_least(1)))
+    {
+        cout << &buf << endl;
+    }
+
+    asio::streambuf::const_buffers_type bufs = buf.data();
+    string data(asio::buffers_begin(bufs),
+                asio::buffers_begin(bufs) + buf.size());
+
+    return data;
+}
+
 //checking which sides are green to let the cars drive
 void Street::startStreet()
 {
+    asio::ip::tcp::socket* streetSocket;
     fillCarQueue(getCarAmount());
 
     if (port != 0)
@@ -67,10 +88,10 @@ void Street::startStreet()
 
             asio::ip::tcp::endpoint ep(ip_address, port);
             asio::ip::tcp::acceptor acceptor(ioCtx, ep);
-            asio::ip::tcp::socket socket(ioCtx);
-            acceptor.accept(socket);
+            streetSocket = new asio::ip::tcp::socket(ioCtx);
+            acceptor.accept(streetSocket);
 
-/*
+            /*
             string save = _read(socket);
             cout << save << endl;
             Car newCar;
@@ -92,6 +113,13 @@ void Street::startStreet()
 
     while (true)
     {
+
+        // read incoming cars
+        cout << "========================" << endl;
+        string save = _read(streetSocket);
+        cout << save << endl;
+        cout << "========================" << endl;
+
         if (!carQueue->empty())
         {
 
@@ -129,22 +157,55 @@ void Street::startStreet()
 
                 Car nextCar = carQueue->front();
                 if (this->direction == NORTH)
+                {
+                    // traffic light t2 north
+                    if (port == 47501)
+                    {
+                        //sending car item
+                        /*
+                        Car tempCar = carQueue->front();
+                        string carJSON = getJSON(tempCar).dump();
+
+                        send_stream << carJSON;
+
+                        carQueue->pop();
+                        write(socket, sender);*/
+                    }
                     println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "NORTH", style::reset);
+                }
                 else
+                {
+                    // traffic light t1 south
+                    if (port == 47500)
+                    {
+                        asio::io_context ioCtx;
+
+                        string host = "127.0.0.1";
+                        string port = to_string(receiverPort);
+
+                        asio::ip::tcp::resolver resolver(ioCtx.get_executor());
+                        asio::ip::basic_resolver_results endpoint = resolver.resolve(host, port);
+
+                        asio::ip::tcp::socket socket(ioCtx);
+                        asio::connect(socket, endpoint);
+
+                        asio::streambuf sender;
+                        ostream send_stream(&sender);
+
+                        //sending car item
+                        Car tempCar = carQueue->front();
+                        string carJSON = getJSON(tempCar).dump();
+                        send_stream << carJSON;
+
+                        carQueue->pop();
+                        write(socket, sender);
+                    }
                     println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
+                }
                 this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
-                
-                /*sending car item
-                Car tempCar = carQueue->front();
-                string carJSON = getJSON(tempCar).dump();
 
-                send_stream << carJSON;
-                
-                carQueue->pop();
-
-                write(socket, sender);
-                socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-                socket.close();*/
+                //socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+                //socket.close();
             }
 
             /*
@@ -155,23 +216,7 @@ void Street::startStreet()
     }
 }
 
-string _read(asio::ip::tcp::socket &socket)
-{
-    asio::streambuf buf;
-    asio::read_until(socket, buf, "\n");
 
-    while (asio::read(socket, buf,
-                      asio::transfer_at_least(1)))
-    {
-        cout << &buf << endl;
-    }
-
-    asio::streambuf::const_buffers_type bufs = buf.data();
-    string data(asio::buffers_begin(bufs),
-                asio::buffers_begin(bufs) + buf.size());
-
-    return data;
-}
 
 void _send(asio::ip::tcp::socket &socket, const string &message)
 {
