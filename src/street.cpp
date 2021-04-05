@@ -16,8 +16,6 @@
 using namespace std;
 using namespace rang;
 
-
-
 //Street constructor
 Street::Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort)
 {
@@ -67,12 +65,7 @@ string _read(asio::ip::tcp::socket &socket)
     return data;
 }
 
-//checking which sides are green to let the cars drive
-void Street::startStreet()
-{
-    asio::ip::tcp::socket* streetSocket;
-    fillCarQueue(getCarAmount());
-
+void Street::startServer() {
     if (port != 0)
     {
         try
@@ -87,9 +80,16 @@ void Street::startStreet()
                 asio::ip::make_address(host);
 
             asio::ip::tcp::endpoint ep(ip_address, port);
-            asio::ip::tcp::acceptor acceptor(ioCtx, ep);
-            streetSocket = new asio::ip::tcp::socket(ioCtx);
-            acceptor.accept(streetSocket);
+            asio::ip::tcp::acceptor acceptor(ioCtx);
+            acceptor.open(ep.protocol());
+            acceptor.bind(ep);
+            acceptor.listen();
+            asio::ip::tcp::socket socket(ioCtx);
+            //streetSocket = &socket;
+            acceptor.accept(socket);
+
+            const string msg = "Hallo\n";
+            asio::write( socket, asio::buffer(msg));
 
             /*
             string save = _read(socket);
@@ -105,20 +105,50 @@ void Street::startStreet()
             socket.shutdown(asio::ip::tcp::socket::shutdown_both);
             socket.close();*/
         }
-        catch (exception &e)
+        catch (exception& e)
         {
+            cout << "ERROR " << endl;
             cout << e.what() << endl;
         }
     }
 
+}
+
+void Street::connect() {
+    asio::io_context ioCtx;
+    //socket creation
+    asio::ip::tcp::socket socket(ioCtx);
+    //connection
+     socket.connect( asio::ip::tcp::endpoint( asio::ip::make_address("127.0.0.1"), receiverPort));
+    // request/message from client
+     const string msg = "Hello from Client!\n";
+    asio::write(socket, asio::buffer(msg));
+
+    // getting response from server
+    asio::streambuf receive_buffer;
+   // string response = _read(socket);
+   // cout << response << endl;
+}
+
+//checking which sides are green to let the cars drive
+void Street::startStreet()
+{
+    //asio::ip::tcp::socket *streetSocket;
+    fillCarQueue(getCarAmount());
+
+
+    if(port == 47500) {
+        this->startServer();
+    }
+    
+    cout << "Port: " + to_string(port) + " ReceiverPort: " + to_string(receiverPort) << endl;
+
     while (true)
     {
+        
 
         // read incoming cars
-        cout << "========================" << endl;
-        string save = _read(streetSocket);
-        cout << save << endl;
-        cout << "========================" << endl;
+        //cout << "Port: " + to_string(port) + " ReceiverPort: " + to_string(receiverPort) << endl;
 
         if (!carQueue->empty())
         {
@@ -176,6 +206,7 @@ void Street::startStreet()
                 else
                 {
                     // traffic light t1 south
+                    /*
                     if (port == 47500)
                     {
                         asio::io_context ioCtx;
@@ -200,8 +231,10 @@ void Street::startStreet()
                         carQueue->pop();
                         write(socket, sender);
                     }
+                    */
                     println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
                 }
+                
                 this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
 
                 //socket.shutdown(asio::ip::tcp::socket::shutdown_both);
@@ -212,11 +245,10 @@ void Street::startStreet()
             } catch(exception& e) {
                 println(e.what());
             }*/
+            this_thread::sleep_for(chrono::milliseconds(50));
         }
     }
 }
-
-
 
 void _send(asio::ip::tcp::socket &socket, const string &message)
 {

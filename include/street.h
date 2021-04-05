@@ -28,10 +28,11 @@ private:
 
     
 public:
-    static short portInc;
-    Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount, unsigned short port = 0, unsigned short receiverPort = 0);
+    Street(int generateAmount, TrafficLight* light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort);
     void startStreet();
     void fillCarQueue(int amount);
+    void connect();
+    void startServer();
     int getCarAmount() {
         return this->carAmount;
     }
