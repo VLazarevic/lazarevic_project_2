@@ -49,7 +49,9 @@ Car buildFromJSON(nlohmann::json json)
 
 string _read(asio::ip::tcp::socket &socket)
 {
+    /*
     asio::streambuf buf;
+    
     asio::read_until(socket, buf, "\n");
 
     while (asio::read(socket, buf,
@@ -57,10 +59,16 @@ string _read(asio::ip::tcp::socket &socket)
     {
         cout << &buf << endl;
     }
+    */
+    
+                
 
+    asio::streambuf buf;
+    asio::read_until( socket, buf, "\n" );
     asio::streambuf::const_buffers_type bufs = buf.data();
     string data(asio::buffers_begin(bufs),
                 asio::buffers_begin(bufs) + buf.size());
+    //string data = asio::buffer_cast<const char*>(buf.data());
 
     return data;
 }
@@ -88,8 +96,8 @@ void Street::startServer() {
             //streetSocket = &socket;
             acceptor.accept(socket);
 
-            const string msg = "Hallo\n";
-            asio::write( socket, asio::buffer(msg));
+            const string msg = "Hallo Test\n";
+            asio::write(socket, asio::buffer(msg));
 
             /*
             string save = _read(socket);
@@ -122,12 +130,13 @@ void Street::connect() {
      socket.connect( asio::ip::tcp::endpoint( asio::ip::make_address("127.0.0.1"), receiverPort));
     // request/message from client
      const string msg = "Hello from Client!\n";
-    asio::write(socket, asio::buffer(msg));
+     //asio::write(socket, asio::buffer(msg));
 
     // getting response from server
+    this_thread::sleep_for(chrono::milliseconds(5000));
     asio::streambuf receive_buffer;
-   // string response = _read(socket);
-   // cout << response << endl;
+    string response = _read(socket);
+   cout << "HIER: " + response << endl;
 }
 
 //checking which sides are green to let the cars drive
