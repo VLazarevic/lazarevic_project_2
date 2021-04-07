@@ -62,13 +62,15 @@ int main(int argc, char *argv[])
 
     this_thread::sleep_for(chrono::milliseconds(2000));
 
-    t2North->connect();
-
+    //t2North->connect();
+    
     thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
     thread t2NorthStreet(&Street::startStreet, t2North);
     thread t2EastStreet(&Street::startStreet, t2East);
     thread t2SouthStreet(&Street::startStreet, t2South);
     thread t2WestStreet(&Street::startStreet, t2West);
+
+    
 
     //define the thread which is going to fill the queue
     thread carFiller([&]() {

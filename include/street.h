@@ -10,7 +10,7 @@
 #include "trafficlights.h"
 #include "car.h"
 #include "enums.h"
-
+#include <asio.hpp>
 #include <iostream>
 #include <queue>
 #include <fstream>
@@ -36,6 +36,7 @@ public:
     int getCarAmount() {
         return this->carAmount;
     }
+    
 
     inline std::string getCurrentTime(std::string s){
             time_t now = time(0);
