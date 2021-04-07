@@ -9,6 +9,7 @@
 #include "car.h"
 #include "enums.h"
 #include "CLI11.hpp"
+#include <spdlog/spdlog.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
@@ -37,40 +38,21 @@ int main(int argc, char *argv[])
 
     CLI11_PARSE(app, argc, argv);
 
+    spdlog::info("Starting Trafficlight system!");
     //set the trafficlight
-    TrafficLight *trafficLight1 = new TrafficLight();
-    TrafficLight *trafficLight2 = new TrafficLight();
+    TrafficLight *trafficLight1 = new TrafficLight("1");
+    TrafficLight *trafficLight2 = new TrafficLight("2");
 
     //set the streets
-    Street *t1North = new Street(amount, trafficLight1, NORTH, carAmount, 0, 0);
+    Street *t1North = new Street(amount, trafficLight1, NORTH, carAmount, 47499, 47500);
     Street *t1East = new Street(amount, trafficLight1, EAST, carAmount, 0, 0);
     Street *t1South = new Street(amount, trafficLight1, SOUTH, carAmount, 47500, 47501);
     Street *t1West = new Street(amount, trafficLight1, WEST, carAmount, 0, 0);
 
     Street *t2North = new Street(amount, trafficLight2, NORTH, carAmount, 47501, 47500);
     Street *t2East = new Street(amount, trafficLight2, EAST, carAmount, 0, 0);
-    Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 0, 0);
+    Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 47502, 47501);
     Street *t2West = new Street(amount, trafficLight2, WEST, carAmount, 0, 0);
-
-    // https://thispointer.com/c11-start-thread-by-member-function-with-arguments/
-    //defining the threads
-    thread t1Thread(&TrafficLight::startTrafficLight, trafficLight1);
-    thread t1NorthStreet(&Street::startStreet, t1North);
-    thread t1EastStreet(&Street::startStreet, t1East);
-    thread t1SouthStreet(&Street::startStreet, t1South);
-    thread t1WestStreet(&Street::startStreet, t1West);
-
-    this_thread::sleep_for(chrono::milliseconds(2000));
-
-    //t2North->connect();
-    
-    thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
-    thread t2NorthStreet(&Street::startStreet, t2North);
-    thread t2EastStreet(&Street::startStreet, t2East);
-    thread t2SouthStreet(&Street::startStreet, t2South);
-    thread t2WestStreet(&Street::startStreet, t2West);
-
-    
 
     //define the thread which is going to fill the queue
     thread carFiller([&]() {
@@ -87,6 +69,27 @@ int main(int argc, char *argv[])
             this_thread::sleep_for(chrono::milliseconds(respawnTime * 1000));
         }
     });
+
+    // https://thispointer.com/c11-start-thread-by-member-function-with-arguments/
+    //defining the threads
+    thread t1Thread(&TrafficLight::startTrafficLight, trafficLight1);
+    thread t1NorthStreet(&Street::startStreet, t1North);
+    thread t1EastStreet(&Street::startStreet, t1East);
+    thread t1SouthStreet(&Street::startStreet, t1South);
+    thread t1WestStreet(&Street::startStreet, t1West);
+
+    this_thread::sleep_for(chrono::milliseconds(2000));
+
+    
+    thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
+    thread t2NorthStreet(&Street::startStreet, t2North);
+    thread t2EastStreet(&Street::startStreet, t2East);
+    thread t2SouthStreet(&Street::startStreet, t2South);
+    thread t2WestStreet(&Street::startStreet, t2West);
+
+    
+
+    
 
     //Starting the threads
     t1Thread.join();

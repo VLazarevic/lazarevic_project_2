@@ -27,23 +27,26 @@
 ** [0.2] - 2021-03-15
 *** Added
 *** Changed
-Street.cpp
+- Street.cpp
 *** Removed
 
 ** [0.3] - 2021-03-29
 *** Added
 *** Changed
-Street.cpp
-Street.h
-Main.cpp
+- Street.cpp
+- Street.h
+- Main.cpp
 *** Removed
 
 ** [0.4] - 2021-04-05
 *** Added
+- spdLog library
 *** Changed
-Street.cpp
-Street.h
-Main.cpp
+- Street.cpp
+- Street.h
+- Trafficlight.cpp
+- Trafficliht.h
+- Main.cpp
 *** Removed
 
 

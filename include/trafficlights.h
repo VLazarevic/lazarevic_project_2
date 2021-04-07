@@ -17,11 +17,13 @@ class TrafficLight {
         TrafficColor colorNorthSouth;
         TrafficColor colorWestEast;
         std::mutex l_mutex;
+        std::string name;
 
     public:
         TrafficColor getNorthSouthColor();
         TrafficColor getWestEastColor();
         void startTrafficLight();
+        TrafficLight(std::string name);
 
         inline std::string getCurrentTime(std::string s){
             time_t now = time(0);

@@ -14,7 +14,9 @@
 using namespace std;
 using namespace rang;
 
-
+TrafficLight::TrafficLight(string name){
+    this->name = name;
+}
 
 TrafficColor TrafficLight::getNorthSouthColor() {
     unique_lock<mutex> unqiue_lock(l_mutex);
@@ -38,26 +40,26 @@ void TrafficLight::startTrafficLight() {
             NorthSouth = false;
             WestEast = true;
             this->colorNorthSouth = RED;
-            println("[TrafficLight] ", fg::red, "North and South Light is now RED", style::reset);
+            println("[TrafficLight " + name + "] ", fg::red, "North and South Light is now RED", style::reset);
             this->colorWestEast = GREEN;
-            println("[TrafficLight] ", fg::green, "West and East Light is now GREEN", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::green, "West and East Light is now GREEN", style::reset);
             counter = 1;
             this_thread::sleep_for(1000ms);
         }else if(counter == 1 && NorthSouth == true) {
             lock_guard<mutex> lock(this->l_mutex);
             logger("The traffic light is yellow");
             this->colorNorthSouth = YELLOW;
-            println("[TrafficLight] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
-            println("[TrafficLight] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
+            println("[TrafficLight" + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
             counter++;
         }else if(counter == 1 && WestEast == true) {
             lock_guard<mutex> lock(this->l_mutex);
             logger("The traffic light is yellow");
             this->colorNorthSouth = YELLOW;
-            println("[TrafficLight] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
+            println("[TrafficLight" + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
-            println("[TrafficLight] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
+            println("[TrafficLight" + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
             counter--;
         }else {
             lock_guard<mutex> lock(this->l_mutex);
@@ -65,9 +67,9 @@ void TrafficLight::startTrafficLight() {
             NorthSouth = true;
             WestEast = false;
             this->colorNorthSouth = GREEN;
-            println("[TrafficLight] ", fg::green, "North and South Light is now GREEN", style::reset);
+            println("[TrafficLight" + name +  "] ", fg::green, "North and South Light is now GREEN", style::reset);
             this->colorWestEast = RED;
-            println("[TrafficLight] ", fg::red, "West and East Light is now RED", style::reset);
+            println("[TrafficLight" + name +  "] ", fg::red, "West and East Light is now RED", style::reset);
             counter++;
             this_thread::sleep_for(100ms);
         }

@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <json.hpp>
+#include "enums.h"
 
 class Car
 {
@@ -16,7 +17,10 @@ private:
     std::string name;
     std::string licensePlate;
     int speed;
+    
+
 public:
+    Directions direction;
     static nlohmann::json generateCar(int amount);
     
     Car() {
