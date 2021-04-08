@@ -22,6 +22,7 @@ class TrafficLight {
     public:
         TrafficColor getNorthSouthColor();
         TrafficColor getWestEastColor();
+        std::string getName();
         void startTrafficLight();
         TrafficLight(std::string name);
 

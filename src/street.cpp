@@ -130,6 +130,7 @@ void Street::startServer()
         try
         {
             asio::io_context ioCtx;
+            asio::error_code ec;
 
             string host = "127.0.0.1";
             cout << "Port: " + to_string(port) << endl;
@@ -148,6 +149,8 @@ void Street::startServer()
 
             spdlog::get("console")->info("[T2 North] CONNECTION ESTABLISHED");
 
+            tmpSocket.connect(asio::ip::tcp::endpoint(ip_address, receiverPort), ec);
+            spdlog::get("console")->info("[to T1 South] CONNECTION ESTABLISHED" + ec.message());
             /*
             string save = _read(socket);
             cout << save << endl;
@@ -297,6 +300,7 @@ void Street::startStreet()
 
             if ((this->direction == WEST || this->direction == EAST) && this->light->getWestEastColor() == GREEN)
             {
+                lock_guard<mutex> lock(this->l_mutex);
                 Car nextCar = carQueue->front();
 
                 if (this->direction == WEST)
@@ -308,6 +312,7 @@ void Street::startStreet()
             }
             else if ((this->direction == NORTH || this->direction == SOUTH) && this->light->getNorthSouthColor() == GREEN)
             {
+                lock_guard<mutex> lock(this->l_mutex);
 
                 Car nextCar = carQueue->front();
                 if (this->direction == NORTH)
@@ -340,7 +345,14 @@ void Street::startStreet()
                         string save = _read(socket);
                         cout << "HIER!!!!!! : " + save << endl;
                         */
-                       cout << "HALLLLLLLLLLLLLLLLLO" << endl;
+                        // t2 north to t1 south
+                        nextCar.direction = NORTH;
+                        string carJSON = getJSON(nextCar).dump() + "\n";
+                        //send_stream << carJSON;
+                        spdlog::get("console")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON);
+
+                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        asio::write(tmpSocket, asio::buffer(carJSON));
                     }
                     else
                     {
@@ -412,7 +424,14 @@ void Street::startStreet()
                             //write(socket, sender);
                             
                         }*/
-                        cout << "OLLLLLLLLLLLLLLLLLAH" << endl;
+                        // t1south to t2north
+                        nextCar.direction = NORTH;
+                        string carJSON = getJSON(nextCar).dump() + "\n";
+                        //send_stream << carJSON;
+                        spdlog::get("console")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
+
+                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        asio::write(streetSocket, asio::buffer(carJSON));
                     }
                     else
                     {

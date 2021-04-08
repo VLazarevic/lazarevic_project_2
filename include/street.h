@@ -13,6 +13,7 @@
 #include <iostream>
 #include <queue>
 #include <fstream>
+#include <mutex>
 
 //#include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
@@ -30,6 +31,8 @@ private:
     unsigned short receiverPort;
     std::queue<Car> *carQueue = new std::queue<Car>();
     //int count = 0;
+
+    std::mutex l_mutex;
 
 public:
     Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort);

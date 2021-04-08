@@ -28,6 +28,11 @@ TrafficColor TrafficLight::getWestEastColor() {
     return this->colorWestEast;
 }
 
+string TrafficLight::getName(){
+    unique_lock<mutex> unqiue_lock(l_mutex);
+    return this->name;
+}
+
 //set or control the TrafficLight: green, red or yellow and give the right outputs to the stages
 void TrafficLight::startTrafficLight() {
     int counter{0};
@@ -51,15 +56,15 @@ void TrafficLight::startTrafficLight() {
             this->colorNorthSouth = YELLOW;
             println("[TrafficLight " + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
-            println("[TrafficLight" + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
             counter++;
         }else if(counter == 1 && WestEast == true) {
             lock_guard<mutex> lock(this->l_mutex);
             logger("The traffic light is yellow");
             this->colorNorthSouth = YELLOW;
-            println("[TrafficLight" + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
-            println("[TrafficLight" + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::yellow, "West and East Light is now YELLOW", style::reset);
             counter--;
         }else {
             lock_guard<mutex> lock(this->l_mutex);
@@ -67,9 +72,9 @@ void TrafficLight::startTrafficLight() {
             NorthSouth = true;
             WestEast = false;
             this->colorNorthSouth = GREEN;
-            println("[TrafficLight" + name +  "] ", fg::green, "North and South Light is now GREEN", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::green, "North and South Light is now GREEN", style::reset);
             this->colorWestEast = RED;
-            println("[TrafficLight" + name +  "] ", fg::red, "West and East Light is now RED", style::reset);
+            println("[TrafficLight " + name +  "] ", fg::red, "West and East Light is now RED", style::reset);
             counter++;
             this_thread::sleep_for(100ms);
         }
