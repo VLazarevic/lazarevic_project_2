@@ -12,6 +12,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <tabulate/table.hpp>
 #include <spdlog/spdlog.h>
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -80,6 +81,26 @@ string _read(asio::ip::tcp::socket &socket)
     return data;
 }
 
+int getTrafficTimer(int queueSize)
+{
+    if (queueSize > 50)
+    {        
+        return 15000;
+    }
+    if (queueSize > 25)
+    {
+        return 10000;
+    }
+    if (queueSize > 10)
+    {
+
+        return 7500;
+        
+    }else{
+        return 5000;
+    }
+}
+
 void Street::startServer()
 {
     if (port == 47500)
@@ -89,8 +110,8 @@ void Street::startServer()
             asio::io_context ioCtx;
 
             string host = "127.0.0.1";
-            cout << "Port: " + to_string(port) << endl;
-            cout << "Receive-Port: " + to_string(receiverPort) << endl;
+            //cout << "Port: " + to_string(port) << endl;
+            //cout << "Receive-Port: " + to_string(receiverPort) << endl;
 
             asio::ip::address ip_address = asio::ip::make_address(host);
 
@@ -133,8 +154,8 @@ void Street::startServer()
             asio::error_code ec;
 
             string host = "127.0.0.1";
-            cout << "Port: " + to_string(port) << endl;
-            cout << "Receive-Port: " + to_string(receiverPort) << endl;
+            //cout << "Port: " + to_string(port) << endl;
+            //cout << "Receive-Port: " + to_string(receiverPort) << endl;
 
             asio::ip::address ip_address = asio::ip::make_address(host);
 
@@ -150,7 +171,7 @@ void Street::startServer()
             spdlog::get("console")->info("[T2 North] CONNECTION ESTABLISHED");
 
             tmpSocket.connect(asio::ip::tcp::endpoint(ip_address, receiverPort), ec);
-            spdlog::get("console")->info("[to T1 South] CONNECTION ESTABLISHED" + ec.message());
+            spdlog::get("console")->info("[to T1 South] CONNECTION ESTABLISHED"); //+ ec.message());
             /*
             string save = _read(socket);
             cout << save << endl;
@@ -308,6 +329,11 @@ void Street::startStreet()
                 else
                     println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "EAST", style::reset);
                 this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
+                //int newTimer = getTrafficTimer(carQueue->size());
+                //spdlog::get("err_logger")->info(to_string(newTimer) + "Zeit für lastverteilung");
+                this->light->setEast_west_timer(getTrafficTimer(carQueue->size()));
+                //cout << getTrafficTimer(carQueue->size()) << endl;
+
                 carQueue->pop();
             }
             else if ((this->direction == NORTH || this->direction == SOUTH) && this->light->getNorthSouthColor() == GREEN)
@@ -351,8 +377,10 @@ void Street::startStreet()
                         //send_stream << carJSON;
                         spdlog::get("console")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON);
 
-                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        //this_thread::sleep_for(chrono::milliseconds(1000));
                         asio::write(tmpSocket, asio::buffer(carJSON));
+
+                        println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "T2-NORTH to T1-NORTH", style::reset);
                     }
                     else
                     {
@@ -362,11 +390,12 @@ void Street::startStreet()
                         //send_stream << carJSON;
                         spdlog::get("console")->info("[T1 North] Sending to Server [T1 South] JSON: " + carJSON);
 
-                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        //this_thread::sleep_for(chrono::milliseconds(1000));
                         asio::write(socket, asio::buffer(carJSON));
+
+                        println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "T1-NORTH to T1-SOUTH", style::reset);
                     }
 
-                    println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "NORTH", style::reset);
                     carQueue->pop();
                 }
                 else
@@ -401,9 +430,9 @@ void Street::startStreet()
                         asio::streambuf sender;
                         ostream send_stream(&sender); */
 
-                            //sending car item
+                        //sending car item
 
-                            /*
+                        /*
 
                             Car tempCar = carQueue->front();
                             string carJSON = getJSON(tempCar).dump();
@@ -430,8 +459,10 @@ void Street::startStreet()
                         //send_stream << carJSON;
                         spdlog::get("console")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
 
-                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        //this_thread::sleep_for(chrono::milliseconds(1000));
                         asio::write(streetSocket, asio::buffer(carJSON));
+
+                        println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "T1-SOUTH to T2-SOUTH", style::reset);
                     }
                     else
                     {
@@ -441,10 +472,12 @@ void Street::startStreet()
                         //send_stream << carJSON;
                         spdlog::get("console")->info("[T2 South] Sending to Server [T2 North] JSON: " + carJSON);
 
-                        this_thread::sleep_for(chrono::milliseconds(1000));
+                        //this_thread::sleep_for(chrono::milliseconds(1000));
                         asio::write(tmpsocket, asio::buffer(carJSON));
+
+                        println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "T2-SOUTH to T2-NORTH", style::reset);
                     }
-                    println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
+                    //println("[CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), " drives away from ", style::bold, "SOUTH", style::reset);
                     carQueue->pop();
 
                     //socket.shutdown(asio::ip::tcp::socket::shutdown_both);
@@ -462,6 +495,8 @@ void Street::startStreet()
                     streetSocket.close();
                     exit(0);
                 }*/
+                this->light->setNorth_south_timer(getTrafficTimer(carQueue->size()));
+                //cout << getTrafficTimer(carQueue->size()) << endl;
             }
         }
     }

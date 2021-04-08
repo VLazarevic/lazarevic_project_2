@@ -46,6 +46,7 @@
 - Street.h
 - Trafficlight.cpp
 - Trafficliht.h
+- car.h
 - Main.cpp
 *** Removed
 
