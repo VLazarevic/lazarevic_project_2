@@ -32,6 +32,7 @@ The following tools were used in this project:
 
 - [C++]
 - [Meson](https://mesonbuild.com/)
+- [:books: rang](https://github.com/agauniyal/rang)
 - [:books: spdlog](https://github.com/gabime/spdlog)
 - [:books: asio](https://think-async.com/Asio)
 - [:books: json](https://github.com/nlohmann/json)
