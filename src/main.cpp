@@ -21,8 +21,7 @@
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
 
     //CLI Implementation
     CLI::App app("TrafficLight-Simulation");
@@ -32,6 +31,7 @@ int main(int argc, char *argv[])
     int amount{0};
     int carAmount{0};
 
+    //CLI Options
     app.add_option("cars", amount, "How many cars after each respawn time respawns\n")->check(CLI::Number)->required();
     app.add_option("respawntime", respawnTime, "The time interval in which new cars spawn\n")->check(CLI::Number)->required();
     app.add_option("car-amount", carAmount, "The amount of cars which should be generated\n")->check(CLI::Number)->required();
@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
 
     spdlog::info("Starting Trafficlight system!");
     //set the trafficlight
-    TrafficLight *trafficLight1 = new TrafficLight("1");
-    TrafficLight *trafficLight2 = new TrafficLight("2");
+    TrafficLight *trafficLight1 = new TrafficLight("1", 0);
+    TrafficLight *trafficLight2 = new TrafficLight("2", 0);
 
     //set the streets
     Street *t1North = new Street(amount, trafficLight1, NORTH, carAmount, 47499, 47500);
@@ -56,13 +56,12 @@ int main(int argc, char *argv[])
 
     //define the thread which is going to fill the queue
     thread carFiller([&]() {
-        while (true)
-        {
+        while (true){
             t1North->fillCarQueue(carAmount);
             t1East->fillCarQueue(carAmount);
-            //t1South->fillCarQueue(carAmount);
+            t1South->fillCarQueue(1); //They cant get cars from anywhere else
             t1West->fillCarQueue(carAmount);
-            //t2North->fillCarQueue(carAmount);
+            t2North->fillCarQueue(1); //They cant get cars from anywhere else
             t2East->fillCarQueue(carAmount);
             t2South->fillCarQueue(carAmount);
             t2West->fillCarQueue(carAmount);
@@ -70,28 +69,24 @@ int main(int argc, char *argv[])
         }
     });
 
-    // https://thispointer.com/c11-start-thread-by-member-function-with-arguments/
     //defining the threads
+    //1st trafficlight system
     thread t1Thread(&TrafficLight::startTrafficLight, trafficLight1);
+    //this_thread::sleep_for(chrono::milliseconds(2000));
     thread t1NorthStreet(&Street::startStreet, t1North);
     thread t1EastStreet(&Street::startStreet, t1East);
     thread t1SouthStreet(&Street::startStreet, t1South);
     thread t1WestStreet(&Street::startStreet, t1West);
 
-    this_thread::sleep_for(chrono::milliseconds(2000));
-
-    
+    //2nd trafficlight system
     thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
+    //this_thread::sleep_for(chrono::milliseconds(2000));
     thread t2NorthStreet(&Street::startStreet, t2North);
     thread t2EastStreet(&Street::startStreet, t2East);
     thread t2SouthStreet(&Street::startStreet, t2South);
     thread t2WestStreet(&Street::startStreet, t2West);
 
-    
-
-    
-
-    //Starting the threads
+    //Joining the threads
     t1Thread.join();
     t1NorthStreet.join();
     t1EastStreet.join();

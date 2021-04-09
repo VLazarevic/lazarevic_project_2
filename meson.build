@@ -21,6 +21,9 @@ add_global_arguments('-I' + get_option('spdlog_include_dir'), language : 'cpp')
 # rang
 add_global_arguments('-I' + get_option('rang_include_dir'), language : 'cpp')
 
+# tabulate
+add_global_arguments('-I' + get_option('tabulate_include_dir'), language : 'cpp')
+
 # json: https://github.com/nlohmann/json
 add_global_arguments('-I' + get_option('json_include_dir'), language : 'cpp')
 

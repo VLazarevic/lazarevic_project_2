@@ -10,14 +10,19 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <spdlog/spdlog.h>
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 using namespace std;
 using namespace rang;
 
-TrafficLight::TrafficLight(string name){
+
+TrafficLight::TrafficLight(string name, int counter){
     this->name = name;
     this->north_south_timer = 5000;
     this->east_west_timer = 5000;
+    this->counter = counter;
 }
 
 TrafficColor TrafficLight::getNorthSouthColor() {
@@ -46,18 +51,17 @@ void TrafficLight::setEast_west_timer(int timer){
     this->east_west_timer = timer;
 }
 
-
-
+//auto file_logger = spdlog::basic_logger_mt("traffic_file_logger", "trafficlight_logger.txt");
+auto file_logger = spdlog::basic_logger_mt("file_logger", "logger.txt");
 //set or control the TrafficLight: green, red or yellow and give the right outputs to the stages
 void TrafficLight::startTrafficLight() {
-    int counter{0};
+    //int counter{0};
     bool NorthSouth = false;
     bool WestEast = false;
     while(true) {
         if(counter == 2) {
-            //lock_guard<mutex> lock(this->l_mutex);
             this->l_mutex.lock();
-            logger("WEST and EAST are green");
+            spdlog::get("file_logger")->info("WEST and EAST are green");
             NorthSouth = false;
             WestEast = true;
             this->colorNorthSouth = RED;
@@ -68,9 +72,8 @@ void TrafficLight::startTrafficLight() {
             this->l_mutex.unlock();
             this_thread::sleep_for(chrono::milliseconds(east_west_timer));
         }else if(counter == 1 && NorthSouth == true) {
-            //lock_guard<mutex> lock(this->l_mutex);
             this->l_mutex.lock();
-            logger("The traffic light is yellow");
+            spdlog::get("file_logger")->info("The traffic light is yellow");
             this->colorNorthSouth = YELLOW;
             println("[TrafficLight " + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
@@ -79,9 +82,8 @@ void TrafficLight::startTrafficLight() {
             this->l_mutex.unlock();
             this_thread::sleep_for(2500ms);
         }else if(counter == 1 && WestEast == true) {
-            //lock_guard<mutex> lock(this->l_mutex);
             this->l_mutex.lock();
-            logger("The traffic light is yellow");
+            spdlog::get("file_logger")->info("The traffic light is yellow");
             this->colorNorthSouth = YELLOW;
             println("[TrafficLight " + name +  "] ", fg::yellow, "North and South Light is now YELLOW", style::reset);
             this->colorWestEast = YELLOW;
@@ -90,9 +92,8 @@ void TrafficLight::startTrafficLight() {
             this->l_mutex.unlock();
             this_thread::sleep_for(2500ms);
         }else {
-            //lock_guard<mutex> lock(this->l_mutex);
             this->l_mutex.lock();
-            logger("NORTH and SOUTH are green");
+            spdlog::get("file_logger")->info("NORTH and SOUTH are green");
             NorthSouth = true;
             WestEast = false;
             this->colorNorthSouth = GREEN;
@@ -103,7 +104,5 @@ void TrafficLight::startTrafficLight() {
             this->l_mutex.unlock();
             this_thread::sleep_for(chrono::milliseconds(north_south_timer));
         }
-        
-        //this_thread::sleep_for(5000ms/*chrono::milliseconds(north_south_timer)*/);
     }
 }

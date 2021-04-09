@@ -1,6 +1,8 @@
 /**
  * projectname: TrafficLight - Simulation 
  * author: Valentino Lazarevic
+ * matnr: i15096
+ * file: car.cpp
  * Desc: Car class where the logic of the functions are implemented
  * */
 
@@ -16,10 +18,8 @@
 using namespace std;
 
 //generate a random string, that get used by defining the license plate
-string random_string( size_t length )
-{
-    auto randchar = []() -> char
-    {
+string random_string( size_t length ){
+    auto randchar = []() -> char{
         const char charset[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -42,8 +42,8 @@ nlohmann::json Car::generateCar(int amount) {
         random_device randomDevice;
         mt19937 gen{randomDevice()};
         
-        vector<string> districtTypes = {"AM", "BN", "BL", "GD", "GF", "HL", "HO", "KO", "KR", "KS", "LF", "MD", "ME", "MI", "NK", "P", "SP", 
-                                        "SB", "SW", "TU", "WN", "WB", "WT", "WY", "ZT"};
+        vector<string> districtTypes = {"AM", "BN", "BL", "GD", "GF", "HL", "HO", "KO", "KR", "KS", "LF", "MD", "ME",
+                                        "MI", "NK", "P", "SP", "SB", "SW", "TU", "WN", "WB", "WT", "WY", "ZT"};
         uniform_real_distribution<> dis{0, (double) districtTypes.size()};
 
         string licensePlate = districtTypes[(int) dis(gen)] + "-" + random_string(5);
@@ -64,7 +64,7 @@ nlohmann::json Car::generateCar(int amount) {
         cars.push_back(car);
     }
 
-
+    //write a JSON with cars
     fstream carStream;
 
     // Clearing file
