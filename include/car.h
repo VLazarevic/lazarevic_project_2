@@ -16,29 +16,25 @@ class Car
     std::string name;
     std::string licensePlate;
     int speed;
-    int direction;
 
   public:
-    
-    static nlohmann::json generateCar(int amount);
+    Directions dir;
+    static nlohmann::json generateCar(int amount, Directions direction);
 
     Car(){
         this->name = "";
         this->licensePlate = "";
         this->speed = 0;
-        this->direction = 0;
     }
 
-    Car(std::string name, std::string licensePlate, int speed, int direction){
+    Car(std::string name, std::string licensePlate, int speed, Directions dir){
         this->name = name;
         this->licensePlate = licensePlate;
         this->speed = speed;
-        this->direction = direction;
+        this->dir = dir;
     }
 
     std::string getLicensePlate();
     std::string getName();
     int getSpeed();
-    int getDirection();
-    void setDirection(int direction);
 };

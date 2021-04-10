@@ -8,11 +8,12 @@
 #pragma once
 
 #include "enums.h"
+#include "car.h"
 #include <iostream>
 #include <mutex>
 #include <fstream>
 #include <queue>
-#include "car.h"
+//#include "street.h"
 
 class TrafficLight {
     private:
@@ -23,10 +24,12 @@ class TrafficLight {
         int north_south_timer;
         int east_west_timer;
         int counter;
+        
 
     public:
-        std::queue<Car> *NorthSouthcarQueue = new std::queue<Car>();
-
+        std::queue<Car> *NorthSouthCarQueue = new std::queue<Car>();
+        //Street* NorthStreet;
+        //Street* SouthStreet;
         TrafficColor getNorthSouthColor();
         TrafficColor getWestEastColor();
         std::string getName();
@@ -34,4 +37,9 @@ class TrafficLight {
         void setEast_west_timer(int timer);
         void startTrafficLight();
         TrafficLight(std::string name, int counter);
+        std::queue<Car> *getQueue() const { 
+            unique_lock<std::mutex> unqiue_lock(l_mutex);
+            return NorthSouthCarQueue; 
+        }
+
 };

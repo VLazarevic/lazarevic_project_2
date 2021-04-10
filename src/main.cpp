@@ -53,15 +53,22 @@ int main(int argc, char *argv[]){
     Street *t2East = new Street(amount, trafficLight2, EAST, carAmount, 0, 0);
     Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 47502, 47501);
     Street *t2West = new Street(amount, trafficLight2, WEST, carAmount, 0, 0);
+/*
+    trafficLight1->SouthStreet = t1South;
+    trafficLight1->NorthStreet = t1North;
+
+    trafficLight2->SouthStreet = t2South;
+    trafficLight2->NorthStreet = t2North;
+*/
 
     //define the thread which is going to fill the queue
     thread carFiller([&]() {
         while (true){
             t1North->fillCarQueue(carAmount);
             t1East->fillCarQueue(carAmount);
-            t1South->fillCarQueue(2); //They cant get cars from anywhere else
+            //t1South->fillCarQueue(1); //They cant get cars from anywhere else
             t1West->fillCarQueue(carAmount);
-            t2North->fillCarQueue(2); //They cant get cars from anywhere else
+            //t2North->fillCarQueue(1); //They cant get cars from anywhere else
             t2East->fillCarQueue(carAmount);
             t2South->fillCarQueue(carAmount);
             t2West->fillCarQueue(carAmount);

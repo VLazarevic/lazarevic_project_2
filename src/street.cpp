@@ -45,7 +45,7 @@ nlohmann::json getJSON(Car tempCar)
     json["name"] = tempCar.getName();
     json["licensePlate"] = tempCar.getLicensePlate();
     json["speed"] = tempCar.getSpeed();
-    json["direction"] = 1;
+    json["direction"] = tempCar.dir;
 
     return json;
 }
@@ -204,12 +204,13 @@ void Street::startStreet()
                 }
 
                 // Processing the token vector
-                for (int i = 0; i < (int)tokens.size(); i++){
+                for (int i = 0; i < (int)tokens.size(); i++)
+                {
                     nlohmann::json carJSON = nlohmann::json::parse(tokens[i]);
                     Car newCar = buildFromJSON(carJSON);
                     carQueue->push(newCar);
-                    spdlog::get("console")->info("[T1 South] New car pushed to queue from Client [T2 North]! " + to_string(tokens.size()));
-                } 
+                    spdlog::get("console")->info("[T1 South] New car pushed to queue from Client [T2 North]! ");
+                }
             }
             catch (exception e)
             {
@@ -222,7 +223,7 @@ void Street::startStreet()
             {
 
                 spdlog::get("console")->info("[T2 North] READING");
-                string save = _read(t2NorthWriteSocket);  
+                string save = _read(t2NorthWriteSocket);
                 vector<string> tokens;
 
                 // stringstream class check1
@@ -237,12 +238,14 @@ void Street::startStreet()
                 }
 
                 // Processing the token vector
-                for (int i = 0; i < (int)tokens.size(); i++){
+                for (int i = 0; i < (int)tokens.size(); i++)
+                {
                     nlohmann::json carJSON = nlohmann::json::parse(tokens[i]);
                     Car newCar = buildFromJSON(carJSON);
-                    carQueue->push(newCar);
-                    spdlog::get("console")->info("[T2 North] New car pushed to queue from Client [T1 South]! " + save);
-                } 
+                    newCar.dir = SOUTH;
+                    this->light->NorthSouthCarQueue->push(newCar);
+                    spdlog::get("console")->info("[T1 South] New car pushed to queue from Client [T2 North]! ");
+                }
             }
             catch (exception e)
             {
@@ -250,12 +253,11 @@ void Street::startStreet()
             }
         }
 
-        if (!carQueue->empty() && !this->light->NorthSouthcarQueue->empty( ))
+        if ((this->direction == WEST || this->direction == EAST) && this->light->getWestEastColor() == GREEN)
         {
-
-            if ((this->direction == WEST || this->direction == EAST) && this->light->getWestEastColor() == GREEN)
+            if (!carQueue->empty())
             {
-                cout << "test" << endl;
+                /*
                 lock_guard<mutex> lock(this->l_mutex);
                 Car nextCar = carQueue->front();
 
@@ -267,132 +269,146 @@ void Street::startStreet()
 
                 this->light->setEast_west_timer(getTrafficTimer(carQueue->size()));
 
-                carQueue->pop();
+                carQueue->pop();*/
             }
-            else if ((this->direction == NORTH || this->direction == SOUTH) && this->light->getNorthSouthColor() == GREEN)
+        }
+        else if ((this->direction == NORTH || this->direction == SOUTH) && this->light->getNorthSouthColor() == GREEN)
+        {
+            lock_guard<mutex> lock(this->l_mutex);
+
+            Car nextCar = carQueue->front();
+            Car NorthSouthNextCar = this->light->getQueue()->front();
+
+            if (this->direction == NORTH)
             {
-                cout << "test" << endl;
-                lock_guard<mutex> lock(this->l_mutex);
 
-                Car nextCar = this->light->NorthSouthcarQueue->front();
-                if (this->direction == NORTH)
+                // traffic light t2 north (client)
+                if (port == 47501)
                 {
-                    // traffic light t2 north (client)
-                    if (port == 47501 && (nextCar.getDirection() == 0 || nextCar.getDirection() == 1) )
+                    if (!this->light->NorthSouthCarQueue->empty())
                     {
-                        //sending car item
+                        if (NorthSouthNextCar.dir == NORTH)
+                        {
+                            string carJSON = getJSON(nextCar).dump() + "\n";
 
-                        // t2 north to t1 south
-                        
-                        
-                        if(nextCar.getDirection() == 0){
-                            nextCar.setDirection(1);
-                            string carJSON = getJSON(nextCar).dump() + '\n';
-                            spdlog::get("console")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON + to_string(nextCar.getDirection())); 
+                            spdlog::get("file_logger")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON);
 
                             asio::write(t2NorthWriteSocket, asio::buffer(carJSON));
-                            this_thread::sleep_for(200ms);
 
-                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ",
-                                    nextCar.getLicensePlate(), " drives away from ", style::bold, "T2-NORTH to T1-SOUTH", style::reset);
-                        }else{
-                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ",
-                                    nextCar.getLicensePlate(), " drives away from ", style::bold, "T2-North to T2-SOUTH", style::reset);
-                            //
-                            
+                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                    " drives away from ", style::bold, "T2-NORTH to T1-SOUTH", style::reset);
+                            count++;
                         }
-                        this->light->NorthSouthcarQueue->pop();
-                        count++;
+                        else if (NorthSouthNextCar.dir == SOUTH)
+                        {
+                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                    " drives away from ", style::bold, "T2-NORTH to T2-SOUTH", style::reset);
+                            this->light->NorthSouthCarQueue->pop();
+                        }
                     }
-                    if(nextCar.getDirection() == 2 && light->getName().compare("1") == 0)
-                    {
-                        
-                        // t1 north to t1 south
-                        nextCar.setDirection(0);
-                        //string carJSON = getJSON(nextCar).dump() + "\n";
-
-                        //spdlog::get("file_logger")->info("[T1 North] Sending to Server [T1 South] JSON: " + carJSON);
-
-                        //asio::write(t1NorthSocket, asio::buffer(carJSON));
-
-                        println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), 
-                                " drives away from ", style::bold, "T1-NORTH to T1-SOUTH", style::reset, nextCar.getDirection());
-
-                                
-                    }
-
                 }
                 else
                 {
-                    // traffic light t1 south
-                    cout << nextCar.getDirection() << endl;
-
-                    if (port == 47500 && (nextCar.getDirection() == 0 || nextCar.getDirection() == 1))
+                    if (!carQueue->empty())
                     {
-                        //sending car item
+                        // t1 north to t1 south
+                        string carJSON = getJSON(nextCar).dump() + "\n";
 
-                        // t1south to t2north
-                        
-                        cout << nextCar.getDirection() << endl;
-                        if(nextCar.getDirection() == 0){
-                            nextCar.setDirection(1);
-                            string carJSON = getJSON(nextCar).dump() + '\n';
+                        spdlog::get("file_logger")->info("[T1 North] Sending to Server [T1 South] JSON: " + carJSON);
+
+                        //asio::write(t1NorthSocket, asio::buffer(carJSON));
+                        nextCar.dir = SOUTH;
+                        this->light->NorthSouthCarQueue->push(nextCar);
+
+                        println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                " drives away from ", style::bold, "T1-NORTH to T1-SOUTH", style::reset);
+
+                        carQueue->pop();
+                    }
+                }
+            }
+            else
+            {
+                // traffic light t1 south
+
+                if (port == 47500)
+                {
+                    //sending car item
+
+                    // t1south to t2north
+                    if (!this->light->NorthSouthCarQueue->empty())
+                    {
+                        if (NorthSouthNextCar.dir == SOUTH)
+                        {
+                            string carJSON = getJSON(nextCar).dump() + "\n";
+
                             spdlog::get("file_logger")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
 
                             asio::write(t1SouthReadSocket, asio::buffer(carJSON));
-                            this_thread::sleep_for(200ms);
 
-                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", 
-                                    nextCar.getLicensePlate(), " drives away from ", style::bold, "T1-SOUTH to T2-NORTH", style::reset);
-                        }else{
-                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ",
-                                    nextCar.getLicensePlate(), " drives away from ", style::bold, "T1-South to T1-North", style::reset);
-                            
+                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                    " drives away from ", style::bold, "T1-SOUTH to T2-NORTH", style::reset);
+                            count++;
                         }
-                        this->light->NorthSouthcarQueue->pop();
-                        count++;
-                    }
-                    if(nextCar.getDirection() == 2 && light->getName().compare("2") == 0)
-                    {
-                        
-                        // t2 south to t2 north
-                        nextCar.setDirection(0);
-                        //string carJSON = getJSON(nextCar).dump() + "\n";
-                        
-                        //spdlog::get("file_logger")->info("[T2 South] Sending to Server [T2 North] JSON: " + carJSON);
-
-                        
-                        //asio::write(t2SouthSocket, asio::buffer(carJSON));
-
-                        println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(), 
-                                " drives away from ", style::bold, "T2-SOUTH to T2-NORTH", style::reset, nextCar.getDirection());
-                                
+                        else if (NorthSouthNextCar.dir == NORTH)
+                        {
+                            println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                    " drives away from ", style::bold, "T1-SOUTH to T1-NORTH", style::reset);
+                            //pop
+                        }
                     }
                 }
-                this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
+                else
+                {
+                    if (!carQueue->empty())
+                    {
+                        // t2 south to t2 north
+                        string carJSON = getJSON(nextCar).dump() + "\n";
 
-                this->light->setNorth_south_timer(getTrafficTimer(carQueue->size()));
+                        spdlog::get("file_logger")->info("[T2 South] Sending to Server [T2 North] JSON: " + carJSON);
+
+                        nextCar.dir = NORTH;
+                        this->light->NorthSouthCarQueue->push(nextCar);
+
+                        //asio::write(t2SouthSocket, asio::buffer(carJSON));
+
+                        println("[Trafficlight ", this->light->getName(), "][CAR] ", fg::cyan, nextCar.getName(), " ", nextCar.getLicensePlate(),
+                                " drives away from ", style::bold, "T2-SOUTH to T2-NORTH", style::reset);
+                        carQueue->pop();
+                    }
+                }
             }
+            this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
+
+            this->light->setNorth_south_timer(getTrafficTimer(carQueue->size()));
         }
     }
+}
+
+void _send(asio::ip::tcp::socket &socket, const string &message)
+{
+    asio::write(socket, asio::buffer(message));
 }
 
 //like the function name says it fills the car queue
 void Street::fillCarQueue(int amount)
 {
     // receive cars, fill queue => receiver
+    nlohmann::json cars;
+    if (this->light->getName().compare("1") == 0)
+    {
+        cars = Car::generateCar(amount, NORTH);
+    }
+    else
+    {
+        cars = Car::generateCar(amount, SOUTH);
+    }
 
-    nlohmann::json cars = Car::generateCar(amount);
     spdlog::get("file_logger")->info("Cars are pushed in the queue");
-    if(this->direction == EAST || this->direction == WEST){
-        for (int i{0}; i < amount; i++){
-        Car tmpCar(cars[i]["name"], cars[i]["licensePlate"], cars[i]["speed"], 2);
+
+    for (int i{0}; i < amount; i++)
+    {
+        Car tmpCar(cars[i]["name"], cars[i]["licensePlate"], cars[i]["speed"], cars[i]["direction"]);
         carQueue->push(tmpCar);
-        }
-    }else{
-        for (int i{0}; i < amount; i++){
-        Car tmpCar(cars[i]["name"], cars[i]["licensePlate"], cars[i]["speed"], 2);
-        this->light->NorthSouthcarQueue->push(tmpCar);
-        }
     }
 }

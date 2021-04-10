@@ -32,7 +32,7 @@ string random_string( size_t length ){
 }
 
 //generate the car, with the attributes: name, licensePlate, speed
-nlohmann::json Car::generateCar(int amount) {
+nlohmann::json Car::generateCar(int amount, Directions direction) {
 
     // JSON
     nlohmann::json cars = {};
@@ -60,6 +60,7 @@ nlohmann::json Car::generateCar(int amount) {
         car["name"] = name;
         car["licensePlate"] = licensePlate;
         car["speed"] = speed;
+        car["direction"] = direction;
 
         cars.push_back(car);
     }
@@ -90,14 +91,6 @@ std::string Car::getName() {
 
 int Car::getSpeed() {
     return this->speed;
-}
-
-int Car::getDirection(){
-    return this->direction;
-}
-
-void Car::setDirection(int direction){
-    this->direction = direction;
 }
 
 
