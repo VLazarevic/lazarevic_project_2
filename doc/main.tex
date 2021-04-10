@@ -1,0 +1,280 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \\documentclass[12pt, oneside]\{article\}\
+\\usepackage[utf8]\{inputenc\}\
+\\usepackage\{graphicx\}\
+\\usepackage\{listings\}\
+\\usepackage[dvipsnames]\{xcolor\}\
+\\usepackage\{titlesec\}\
+\\usepackage\{color\}\
+\
+\\usepackage[\
+backend=biber,\
+style=alphabetic,\
+sorting=ynt\
+]\{biblatex\}\
+\
+\\addbibresource\{literatur.bib\}\
+\
+%Vom Internet\
+\\lstset\{\
+    frame=tb, % draw a frame at the top and bottom of the code block\
+    tabsize=4, % tab space width\
+    showstringspaces=false, % don't mark spaces in strings\
+    numbers=left, % display line numbers on the left\
+    commentstyle=\\color\{darkgray\}, % comment color\
+    keywordstyle=\\color\{blue\}, % keyword color\
+    stringstyle=\\color\{purple\} % string color\
+\}\
+\
+\\titleformat\{\\paragraph\}\
+\{\\normalfont\\normalsize\\bfseries\}\{\\theparagraph\}\{1em\}\{\}\
+\\titlespacing*\{\\paragraph\}\
+\{0pt\}\{3.25ex plus 1ex minus .2ex\}\{1.5ex plus .2ex\}\
+\
+\\title\{Simulation zweier Ampelsteuerung die miteinander kommunizieren\}\
+\\author\{Projektnummer: 19 \\\\ Valentino Lazarevic, 5CHIF\}\
+\\date\{April 2021\}\
+\
+\\begin\{document\}\
+\
+\
+\
+\\begin\{titlepage\}\
+\\maketitle\
+\\includegraphics[scale=0.18]\{ampel.jpg\}\
+\\end\{titlepage\}\
+\
+\\tableofcontents\
+\\newpage\
+\
+\
+\
+\\section\{Einf\'fchrung\}\
+Heutzutage sind Ampeln aus der Gessellschaft nicht mehr wegzudenken. Sie regeln den Verkehr in bestimmten Situationen und sorgen f\'fcr einen sicheren Verkehrsfluss und vermeiden Unf\'e4lle. Zu Wissen ist das an einer Kreuzung alle Ampeln miteinander verbunden sind, sodass sie aufeinander abgestimmt umschalten. Die Ampeln funktionieren computergesteuert durch einen Algorithmus, der \'fcber einen Schaltkasten, zu den Ampeln der Kreuzung durch Kabel miteinander verbunden ist. \
+\
+\\subsection\{Projekt Aufgabe\}\
+Die Aufgabe besteht darin, zwei Ampelsystem miteinander zu kommunizieren zu lassen. Dabei kommuniziert die S\'fcdstra\'dfe der ersten Ampel mit der Nordstra\'dfe der zweiten Ampel. Au\'dferdem soll eine Lastverteilung der Stra\'dfen zustande kommen. Damit wird die Aulastung der einzelnen Stra\'dfen gemeint. Zum Beispiel wenn die Oststra\'dfe mehr als 10 Autos hat, die warten das die AMpel Gr\'fcn wird. Wird diese bei der n\'e4chsten Gr\'fcnschaltung l\'e4nger Gr\'fcn bleiben, damit mehr Autos durchkommen.\
+\
+\\subsection\{Idee der Implementierung\}\
+Die Implementierung der Kommunikation wird \'fcber das Lesen und Schreiben auf Sockets realisiert. Sowohl die S\'fcdstra\'dfe der ersten Ampel als auch die Nordstra\'dfe der zweiten Ampel besitzen solch ein Socket \'fcber den diese kommunizieren. Die Kommunikation zwischen den Stra\'dfen, was nur die Nord und die S\'fcdseite jeweiliger Ampel betrifft, wird \'fcber die geteilte Queue Ressource erledigt. Dabei wird ein Token System ber\'fccksichtigt, dass entscheidet welches Auto Element zur welcher Stra\'dfe geh\'f6rt:\
+\\begin\{itemize\}\
+    \\item 2 = S\'fcd\
+    \\item 1 = Nord\
+    \\item 0 = Gegen\'fcberlige Stra\'dfe der anderen Ampel\
+\\end\{itemize\}\
+Die Idee zur Lastverteilung ist, dass die Queue Gr\'f6\'dfe abgefragt wird. Diese entscheidet, ob die Zeit bei der n\'e4chsten Gr\'fcnpahse verg\'f6\'dfert oder verkleinert wird. \
+\
+\\subsection\{Meine Problematiken\}\
+Bei der Umsetzung der Kommunikation, sowohl bei der Ampelschaltungen sind viele Probleme entstanden. Da die Stra\'dfen nicht miteinander verbunden sind, wissen diese nicht welche Autos z.B. im Norden ankommen bzw. vorbei fahren. Dies musste ge\'e4ndert werden, im Kapitel (ref) wird dies auch erkl\'e4rt. Weiters wurde die Kommunikationsarchitektur mehrmals \'fcberdacht und ver\'e4ndert. Zuerst sollten die Nordstra\'dfe mit der S\'fcdstra\'dfe beider Ampel verbunden sein. Danach sollte die S\'fcdstra\'dfe mit der Nordstra\'dfe der jeweiligen Ampeln kommunizieren. Jedoch reagieren in dem Fall die Server Nord- und S\'fcdstra\'dfe immer nur auf einen Socket und dieser war auf der gleichen Ampel schon belegt. Daher wurde die Implementierung der Kommunikation ver\'e4ndert, wie diese nun ist wird im Kapitel (ref) besprochen. Da die Implemtierung der Kommunikation (ref) in der street.cpp durchgef\'fchrt wurde, wusste Ich zuerst nicht wie die Ports den Stra\'dfen zugeteilt werden. Dies wurde gel\'f6st in dem der Port bzw. der Empf\'e4nger Port im Konstruktor der Stra\'dfe \'fcbergeben wurde. \
+\
+\
+\\section\{Verwendung der Bibliotheken\}\
+\\subsection\{Allgemeine Informationen\}\
+Die Bibliotheken wurden in der STANDALONE Variante verwendet. Damit ist die Header Only Version gemeint. Diese wird einfach \'fcber die meson\\_options.txt hinzugef\'fcgt. Die Bibliotheken sind im Referenzverzeichnis verlinkt.\
+\
+\\subsection\{ASIO\}\
+ Die ASIO Bibliothek auch genannt asynchronous stream input/output Library wird f\'fcr die Netzwerk Programmierung in C++ verwendet. Au\'dferdem ist diese Open Source und somit f\'fcr jeden zug\'e4nglich. Die Boost::Asio Version enth\'e4lt weitere Features, da diese nicht als Header Only Version kommt. In diesem Projekt wird ASIO zur Kommunikation zwischen der ersten und der zweiten Ampel verwendet. Die Kommunikation wird im Kapitel (ref) genauer erkl\'e4rt. \
+ \
+\\subsection\{CLI11\}\
+Die CLI11 Bibliothek wird zur Verbesserung der Bedienung verwendet. Genauere Information zur Funktion und Einsetzung von CLI wird im Kapitel (ref Kapitel Bedienung) besprochen.\
+\
+\\subsection\{RANG\}\
+Die Rang Bibliothek dient zur Modifizierung der Ausgabe. Dies wird erreicht indem die Ausgabe in verschiedenen Farben bzw. Arten(\\textbf\{FETT\}, \\textit\{kursiv\} oder \\underline\{unterstrichen\}) gekennzeichnet wird. Im Projekt wird die Ausgabe farblich markiert, dies f\'fchrt zu einer \'fcbersichtlichen Ausgabe.\
+\\subsection\{SPDLOG\}\
+Die spdLog Bibliothek dient wie der Name schon sagt zum Loggen. Mit spdLog ist das Loggen in Dateien als auch in die Konsole m\'f6glich. Weiters bringt die Bibliothe viele weiter Features. Das Loggen wird explizit im Kapitel (ref) nohcmals erkl\'e4rt und beschrieben.\
+\
+\\subsection\{JSON\}\
+Die Nholmann JSON Bibliothek ist eine moderne L\'f6sung f\'fcr die Verwendung von JSON in C++. Wichtige Aspekte dieser Bibliothek ist die Performance, da das Nholmann/Json z.B. schneller als Vektoren und Maps ist. Aber auch die Nutzung von Speicher ist effizienter gestaltet. Das JSON wird im Projekt beim serialisieren bzw. deserialisieren verwendet, als auch bei der Generierung der Autos in dem diese in eine JSON Datei geschrieben werden. Genauere Erkl\'e4rung folgt im Kapitel (ref).\
+\
+\
+\\newpage\
+\\section\{Implementierung des Ampelsystems\}\
+\\subsection\{Enum\}\
+\\emph\{''Mit enum k\'f6nnen Aufz\'e4hlungstypen definiert werden. Dazu geh\'f6ren Wochentage oder Farben. Den Elementen eines Aufz\'e4hlungstyps werden Namen zugeordnet, obwohl sie intern nat\'fcrlich als Zahlen codiert werden.''\}\\cite\{EnumDefinition\} \\vspace\{1em\}\
+\
+\\noindent In meinem Programm sind folgende enums definiert:\\newline\
+\
+\\begin\{lstlisting\}[language=C++, caption=\{C++ enums.h\}]\
+enum TrafficColor \{RED = 1, YELLOW = 2, GREEN = 3\};\
+enum Directions \{NORTH = 1, SOUTH = 2, WEST = 3, EAST = 4\};\
+\\end\{lstlisting\}\
+\
+\\subsection\{Ampel - (trafficlight)\}\
+\\paragraph\{Aufgabe\}\
+Die \\textbf\{Ampel\} ist in meinem Programm zust\'e4ndig, die richtigen Ausgaben zu t\'e4tigen. Um der Stra\'dfe mitzueilen, welche Stra\'dfeneinm\'fcndung auf Gr\'fcn oder Rot bzw. auf Gelb gestellt ist. Weiters speichert die Klasse die Queue der Nord und S\'fcdstra\'dfe.\
+\\paragraph\{Klassenstruktur\}\
+\\begin\{lstlisting\}[language=C++, caption=\{C++ trafficlight.h - Klassenstruktur\}]\
+class TrafficLight\
+\{\
+  private:\
+    TrafficColor colorNorthSouth;   //enum\
+    TrafficColor colorWestEast;     //enum\
+    std::mutex l_mutex;\
+    std::string name;\
+    int north_south_timer;\
+    int east_west_timer;\
+    int counter;            //Entscheidet welche Seiten beginnen\
+  public:\
+    std::queue<Car> *NorthSouthcarQueue = new std::queue<Car>();\
+    \
+    Trafficlight(std::string name, int counter);\
+    TrafficColor getNorthSouthColor();\
+    TrafficColor getWestEastColor();\
+    std::string getName();\
+    void setNorth_south_timer(int timer);\
+    void setEast_west_timer(int timer);\
+    void startTrafficLight();\
+\};\
+\\end\{lstlisting\}\
+\
+\\noindent Wie wir sehen k\'f6nnen besitzt die Klasse drei wichtige Funktionen. Die ersten beiden Funktionen - getNorthSouthColor und getWestEastColor liefern den aktuellen Status der Ampel an der gew\'fcnschten Stra\'dfe. Die Funktion startTrafficLight startet und verwaltet die Ausgaben der Ampel. Ein Beispiel:\\vspace\{1em\} \
+\
+\\noindent [TrafficLight 1] \\textcolor\{ForestGreen\}\{North and South Light is now GREEN\} \\newline\
+[TrafficLight 1] \\textcolor\{red\}\{West and East Light is now RED\}\\vspace\{1em\} \
+\
+\\noindent Die Funktion getName wird zur Verbesserung der Ausgabe verwendet, das jetzt zwei Ampel auftretten. Weiters gibt es die setter Funktion f\'fcr die Lastverteilung, diese setzen die Zeit der Ampelausgabe.\\vspace\{1em\} \
+\
+\\noindent Sehr wichtig ist die queue, auf die die verbundenen Stra\'dfen der eigenen Ampel zugreifen. Diese wird in die Ampel Klasse ausgelagert, da die Ampel unterschieden werden kann zwischen den beiden Ampeln.\
+\
+\
+\\subsection\{Stra\'dfe - (street)\}\
+\\paragraph\{Aufgabe\}\
+Die \\textbf\{Stra\'dfe\} ist f\'fcr die Auff\'fcllung der Auto-Queue zust\'e4ndig. Weiters ''schickt'' die Klasse die Autos \'fcber die Stra\'dfe. Dies wird mit einer Ausgabe markiert. Ein Beispiel: \\vspace\{1em\}\
+\
+\\noindent [CAR] \\textcolor\{cyan\}\{AUDI HL-B7GF9 drives away from NORTH\} \\vspace\{1em\}\
+\
+\\noindent Au\'dferdem erfolgt die Kommunikation in der Street.cpp, wie die Lastverteilung. Diese werden jedoch im Kapitel ref() und ref() erkl\'e4rt. Somit speichert sich die Klasse den Port und den Empf\'e4nger Port.\
+\
+\
+\
+\\paragraph\{Klassenstruktur\}\
+\\begin\{lstlisting\}[language=C++, caption=\{C++ street.h - Klassenstruktur\}]\
+class Street\
+\{\
+private:\
+    TrafficLight* light;\
+    Directions direction;\
+    int generateAmount;\
+    int carAmount;\
+    unsigned short port;\
+    unsigend short receiverPort;\
+    std::queue<Car>* carQueue = new std::queue<Car>();\
+    std::mutex l_mutex;\
+public:\
+    Street(int generateAmount, TrafficLight* light,\
+           Directions direction, int carAmount, unsigned short port,\
+           unsigned short receiverPort);\
+    void startStreet();\
+    void fillCarQueue(int amount);\
+    void startServer();\
+    int getCarAmount();\
+\};\
+\\end\{lstlisting\}\
+\\noindent Die Struktur enth\'e4lt die wichtige \\emph\{carQueue\}, die die Autos beinhaltet, diese z\'e4hlt jedoch nur f\'fcr die Ost und Westseiten der Ampel. Weiters enth\'e4lt die Klasse die Menge - (Zahl) an nach-generierten Autos. Die Richtung in die die Autos fahren. Wie bei den Aufgaben schon erk\'e4rt. Die beiden Funktionen sind am Namen selbst erkl\'e4rend, startStreet ist f\'fcr die Ausgabe der fahrenden Autos zust\'e4ndig bzw. l\'f6scht diese nach der \'dcberfahrt aus der Queue heraus. Dazu kommt das die Funktion die Autos auf die Sockets schreibt. Die Funktion StartServer wird ausgef\'fchrt um den Server zu starten, der auf die Verbindung wartet. Genaueres im Kapitel (ref). Die Methode fillCarQueue f\'fcllt die Queue mit generierten Autos.\
+\
+\\subsection\{Auto - (car)\}\
+\\label\{car\}\
+\\paragraph\{Aufgabe\}\
+Die \\textbf\{Auto\} Klasse stellt das generierte Auto zur Verf\'fcgung. Diese beinhaltet das Kennzeichen, die Automarke und die Zeit wie lang das Auto ben\'f6tigt um \'fcber die Stra\'dfe zu fahren. Au\'dferdem speichert die Klasse die Richtung, dass das Auto f\'e4hrt.  \
+\
+\\paragraph\{Klassenstruktur\}\
+\\begin\{lstlisting\}[language=C++, caption=\{C++ car.h - Klassenstruktur\}]\
+class Car\
+\{\
+  private:\
+    std::string name;\
+    std::string licensePlate;\
+    int speed;\
+    int direction\
+  public:\
+    static nholmann::json generateCar(int amount);\
+    \
+    Car(std::string name, std::string licensePlate, int speed, \
+        int direction = 0) \{\
+        this->name = name;\
+        this->licensePlate = licensePlate;\
+        this->speed = speed;\
+        this->direction = direction;\
+    \}\
+\
+    std::string getLicensePlate();\
+    std::string getName();\
+    int getSpeed();\
+    int getDirection();\
+    void setDirection(int direction);\
+\};\
+\\end\{lstlisting\}\
+ Die Auto-Klassenstruktur generiert das \\emph\{Auto\} und ihre \\emph\{Eigenschaften\}. Diese werden in eine JSON-Datei ausgelegt. Die Methode generateCar erstellt das Auto, dieses beinhaltet das zuf\'e4llig generierten Kennzeichen. Zur der genauen Erkl\'e4rung kommen wir im Kapitel \\ref\{generateAuto\}. Au\'dferdem wird die Direction - wohin das Auto f\'e4hrt, in dieser Klasse gespeichert. F\'fcr den Zugriff wurde ein Get und Set-Mehtode definiert.\
+\
+\
+\\section\{Implementierung der Kommunikation\}\
+\\section\{Implementierung der Lastverteilung\}\
+\
+\\newpage\
+\\section\{Bedienung\}\
+Zur besseren Bedienung wurde die Header-only Datei CLI11.hpp verwendet. Diese implementiert ein userfreundliches Kommandozeilen Interface \'fcber das man das Programm konfigurieren\
+kann. Alle eingegebenen Werte werden vor dem Start der Simulation \'fcberpr\'fcft und falls notwendig auch Fehler geworfen.\
+\
+\\subsection\{--help, -h\}\
+Mittels ./project -h oder --help, werden die n\'f6tigen Parameter bzw. Funktionen angezeigt. In meinem Beispiel w\'fcrde die Ausgabe folgenderma\'dfen Aussehen:\
+\
+\\begin\{lstlisting\}[caption=\{Ausgabe - --help, -h\}]\
+TrafficLight-Simulation\
+Usage: ./project [OPTIONS] cars respawntime\
+\
+Positionals:\
+  cars INT:NUMBER REQUIRED    \
+  How many cars after each respawn time respawns\
+                              \
+  respawntime INT:NUMBER REQUIRED\
+  The time interval in which new cars spawn\
+                              \
+Options:\
+  -h,--help                 \
+  Print this help message and exit\
+\\end\{lstlisting\}\
+\\subsection\{cars\}\
+Verpflichtend ist die Eingabe von \\textbf\{cars\}. Damit ist die Menge an Autos gemeint, die nach einer gewissen Zeit wieder an die Stra\'dfe kommen. Dieser Parameter muss ein Integer sein.\
+\
+\\subsection\{respawntime\}\
+Die \\textbf\{respawntime\} ist ebenfalls verpflichtend. Diese regelt die Zeit, in der Autos generiert werden. Zum Beispiel: ./projects 1 10 w\'fcrde jede 10 sek ein Auto generieren lassen. Dieser Parameter muss ein Integer sein.\
+\
+\\newpage\
+\\section\{Zustatzfunktion\}\
+\\subsection\{Logger\}\
+Der \\textbf\{Logger\} ist f\'fcr das loggen bestimmter Funktionen zust\'e4ndlich. Diese Informationen schreibt die Funktion in eine externe Datei hinein. Der Dateiname besteht aus dem log\\_ und den aktuellen Tag, an den der Logger fungiert hat. Ein Beispiel: log\\_2021-02-10.txt. Sollte an dem Tag der Logger bereits geschrieben haben, wird diese Datei erweitert. Um solche Logs zu unterscheiden steht in der Datei die aktuelle Uhrzeit des Logs. Diese Datei wird im Log Ordner abgespeichert.\
+Am folgenden Beispiel k\'f6nnen Sie sehen, wie der Logger aufgebaut ist:\
+\
+\\vspace\{1em\} \\noindent\
+Die Methode \\textbf\{getCurrentTime\} stellt jeweils einen String zur Verf\'fcgung der entweder den aktuellen Tag oder die aktuelle Uhrzeit zur\'fcck gibt. \
+\
+\\vspace\{1em\} \\noindent\
+Die Methode \\textbf\{logger\} erstellt die Datei mit der Verwendung der vorherigen Methode und schreibt den angegeben Parameter in diese Datei hinein. \
+\
+\\subsection\{Auto - Generierung\}\
+\\label\{generateAuto\}\
+\
+Die Auto Generierung erfolgt in der Car Klasse siehe: \\ref\{car\}.\\newline \
+\
+\\vspace\{0.5em\} \\noindent\
+Besonders dabei ist die Generierung des \\textbf\{Kenzeichen\}, da erstens alle Bezirksa- bk\'fcrzungen des Bundeslandes Nieder\'f6sterreich zur Verf\'fcgung stehen. Weiters wird das Kennzeichen mittels einer Funktion die zuf\'e4llige Zeichenketten zur\'fcckgibt erstellt. Im folgenden Code St\'fcck sehen Sie wie dies funktioniert:\
+\
+\
+Die Ermittlung der \\textbf\{Marke\} erfolgt durch einen zuf\'e4lligen Zugriff auf einen Vector der mit Automarken bef\'fcllt ist.\\newline\
+\
+\\noindent\
+Die Ermittlung der \\textbf\{Zeit\}, dass das Auto f\'fcr die \'dcberquerung ben\'e4tigt wird von einer Zuf\'e4lligen Zeit bestimmt. Diese liegt zwischen 1 und 2.5 Sekunden.\
+\
+\
+\
+\\newpage\
+\\printbibliography\
+\
+\\end\{document\}\
+}
