@@ -1,6 +1,8 @@
 /**
  * projectname: TrafficLight - Simulation 
  * author: Valentino Lazarevic
+ * matnr: i15096
+ * file: main.cpp
  * Desc: The main where everything starts
  * */
 
@@ -21,7 +23,7 @@
 
 using namespace std;
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 
     //CLI Implementation
     CLI::App app("TrafficLight-Simulation");
@@ -53,17 +55,10 @@ int main(int argc, char *argv[]){
     Street *t2East = new Street(amount, trafficLight2, EAST, carAmount, 0, 0);
     Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 47502, 47501);
     Street *t2West = new Street(amount, trafficLight2, WEST, carAmount, 0, 0);
-/*
-    trafficLight1->SouthStreet = t1South;
-    trafficLight1->NorthStreet = t1North;
-
-    trafficLight2->SouthStreet = t2South;
-    trafficLight2->NorthStreet = t2North;
-*/
 
     //define the thread which is going to fill the queue
     thread carFiller([&]() {
-        while (true){
+        while (true) {
             t1North->fillCarQueue(carAmount);
             t1East->fillCarQueue(carAmount);
             //t1South->fillCarQueue(1); //They cant get cars from anywhere else
@@ -79,7 +74,6 @@ int main(int argc, char *argv[]){
     //defining the threads
     //1st trafficlight system
     thread t1Thread(&TrafficLight::startTrafficLight, trafficLight1);
-    //this_thread::sleep_for(chrono::milliseconds(2000));
     thread t1NorthStreet(&Street::startStreet, t1North);
     thread t1EastStreet(&Street::startStreet, t1East);
     thread t1SouthStreet(&Street::startStreet, t1South);
@@ -87,10 +81,9 @@ int main(int argc, char *argv[]){
 
     //2nd trafficlight system
     thread t2Thread(&TrafficLight::startTrafficLight, trafficLight2);
-    //this_thread::sleep_for(chrono::milliseconds(2000));
+    thread t2SouthStreet(&Street::startStreet, t2South);
     thread t2NorthStreet(&Street::startStreet, t2North);
     thread t2EastStreet(&Street::startStreet, t2East);
-    thread t2SouthStreet(&Street::startStreet, t2South);
     thread t2WestStreet(&Street::startStreet, t2West);
 
     //Joining the threads

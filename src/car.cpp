@@ -7,19 +7,19 @@
  * */
 
 #include "car.h"
+#include <json.hpp>
 #include <fstream>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <random>
 #include <algorithm>
-#include <json.hpp>
 
 using namespace std;
 
 //generate a random string, that get used by defining the license plate
-string random_string( size_t length ){
-    auto randchar = []() -> char{
+string random_string( size_t length ) {
+    auto randchar = []() -> char {
         const char charset[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -33,7 +33,6 @@ string random_string( size_t length ){
 
 //generate the car, with the attributes: name, licensePlate, speed
 nlohmann::json Car::generateCar(int amount, Directions direction) {
-
     // JSON
     nlohmann::json cars = {};
 
@@ -93,5 +92,12 @@ int Car::getSpeed() {
     return this->speed;
 }
 
+Directions Car::getDir() {
+    return this->dir;
+}
+
+void Car::setDir(Directions direction) {
+    this->dir = direction;
+}
 
 

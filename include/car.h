@@ -1,14 +1,16 @@
 /**
  * projectname: TrafficLight - Simulation 
- * author: Valentino Lazarevic
+ * author: Valentino Lazarevic#
+ * matNr: i15096
+ * file:car.h
  * Desc: Definition of Car class and implemtation of the constructoe
  * */
 
 #pragma once
 
-#include <iostream>
-#include <json.hpp>
 #include "enums.h"
+#include <json.hpp>
+#include <iostream>
 
 class Car
 {
@@ -16,15 +18,17 @@ class Car
     std::string name;
     std::string licensePlate;
     int speed;
+    Directions dir;
 
   public:
-    Directions dir;
     static nlohmann::json generateCar(int amount, Directions direction);
-
+  
     Car(){
-        this->name = "";
-        this->licensePlate = "";
-        this->speed = 0;
+        this->name = "VW";
+        this->licensePlate = "WB-3456";
+        this->speed = 1500;
+        this->dir = NORTH;
+
     }
 
     Car(std::string name, std::string licensePlate, int speed, Directions dir){
@@ -37,4 +41,6 @@ class Car
     std::string getLicensePlate();
     std::string getName();
     int getSpeed();
+    Directions getDir();
+    void setDir(Directions direction);
 };

@@ -24,23 +24,6 @@ add_global_arguments('-I' + get_option('rang_include_dir'), language : 'cpp')
 # json: https://github.com/nlohmann/json
 add_global_arguments('-I' + get_option('json_include_dir'), language : 'cpp')
 
-# add additional include global arguments appropriately!
-
-# # begin protobuf: https://developers.google.com/protocol-buffers/
-# # protobuf: must be installed independently and has to be found...
-# protoc = find_program('protoc', required : true)
-# protobuf_dep = dependency('protobuf', required : true)
-
-# gen = generator(protoc, \
-#   output    : ['@BASENAME@.pb.cc', '@BASENAME@.pb.h'],
-#   arguments : ['--proto_path=@CURRENT_SOURCE_DIR@/src', '--cpp_out=@BUILD_DIR@', '@PLAINNAME@'])
-
-# # change proto file accordingly
-# generated = gen.process('src/dummy.proto')
-# # end protobuf
-
-# subdir('SUBDIR1')
-
 inc_dir = include_directories('include')
 src = ['src/main.cpp', 'src/trafficlight.cpp', 'src/util.cpp', 'src/car.cpp', 'src/street.cpp']
 #protobuf: src = ['src/main.cpp', generated]

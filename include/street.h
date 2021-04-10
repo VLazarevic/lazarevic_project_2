@@ -1,6 +1,8 @@
 /**
  * projectname: TrafficLight - Simulation 
  * author: Valentino Lazarevic
+ * matNr: i15096
+ * file: street.h
  * Desc: Definition of Street class and the inline logger functions
  * */
 
@@ -9,19 +11,12 @@
 #include "trafficlights.h"
 #include "car.h"
 #include "enums.h"
-#include <asio.hpp>
 #include <iostream>
 #include <queue>
 #include <fstream>
 #include <mutex>
 
-//#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/rotating_file_sink.h"
-#include <spdlog/spdlog.h>
-
-
-class Street
-{
+class Street{
 private:
     TrafficLight *light;
     Directions direction;
@@ -33,13 +28,10 @@ private:
     std::mutex l_mutex;
 
 public:
-    Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort);
+    Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, 
+           unsigned short port, unsigned short receiverPort);
     void startStreet();
     void fillCarQueue(int amount);
-    void connect();
     void startServer();
-    int getCarAmount()
-    {
-        return this->carAmount;
-    }
+    int getCarAmount();
 };
