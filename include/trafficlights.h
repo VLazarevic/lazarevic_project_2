@@ -11,6 +11,8 @@
 #include <iostream>
 #include <mutex>
 #include <fstream>
+#include <queue>
+#include "car.h"
 
 class TrafficLight {
     private:
@@ -23,6 +25,8 @@ class TrafficLight {
         int counter;
 
     public:
+        std::queue<Car> *NorthSouthcarQueue = new std::queue<Car>();
+
         TrafficColor getNorthSouthColor();
         TrafficColor getWestEastColor();
         std::string getName();

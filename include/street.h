@@ -36,7 +36,6 @@ public:
     Street(int generateAmount, TrafficLight *light, Directions direction, int carAmount, unsigned short port, unsigned short receiverPort);
     void startStreet();
     void fillCarQueue(int amount);
-    void connect();
     void startServer();
     int getCarAmount()
     {

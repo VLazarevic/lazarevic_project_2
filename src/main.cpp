@@ -59,9 +59,9 @@ int main(int argc, char *argv[]){
         while (true){
             t1North->fillCarQueue(carAmount);
             t1East->fillCarQueue(carAmount);
-            t1South->fillCarQueue(1); //They cant get cars from anywhere else
+            t1South->fillCarQueue(2); //They cant get cars from anywhere else
             t1West->fillCarQueue(carAmount);
-            t2North->fillCarQueue(1); //They cant get cars from anywhere else
+            t2North->fillCarQueue(2); //They cant get cars from anywhere else
             t2East->fillCarQueue(carAmount);
             t2South->fillCarQueue(carAmount);
             t2West->fillCarQueue(carAmount);

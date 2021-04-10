@@ -92,5 +92,13 @@ int Car::getSpeed() {
     return this->speed;
 }
 
+int Car::getDirection(){
+    return this->direction;
+}
+
+void Car::setDirection(int direction){
+    this->direction = direction;
+}
+
 
 
