@@ -26,7 +26,6 @@ add_global_arguments('-I' + get_option('json_include_dir'), language : 'cpp')
 
 inc_dir = include_directories('include')
 src = ['src/main.cpp', 'src/trafficlight.cpp', 'src/util.cpp', 'src/car.cpp', 'src/street.cpp']
-#protobuf: src = ['src/main.cpp', generated]
 
 executable('trafficlight-sim',
            sources : src,
