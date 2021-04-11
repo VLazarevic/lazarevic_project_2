@@ -102,6 +102,7 @@ void Street::startServer() {
             acceptor.accept(t1SouthReadSocket);
 
             spdlog::get("console")->info("[T1 South] CONNECTION ESTABLISHED");
+            spdlog::get("file_logger")->info("[T1 South] CONNECTION ESTABLISHED");
         } catch (exception &e) {
             spdlog::get("err_logger")->info("ERROR");
             cout << e.what() << endl;
@@ -130,6 +131,7 @@ void Street::startStreet() {
         t2NorthWriteSocket.connect(asio::ip::tcp::endpoint(ip_address, receiverPort), ec);
 
         spdlog::get("console")->info("[T2 North] Client connected to server [T1 South]");
+        spdlog::get("file_logger")->info("[T2 North] Client connected to server [T1 South]");
     }
 
     int count = 0;
@@ -139,6 +141,7 @@ void Street::startStreet() {
             try {
 
                 spdlog::get("console")->info("[T1 South] READING");
+                spdlog::get("file_logger")->info("[T1 South] READING");
 
                 string save = _read(t1SouthReadSocket);
 
@@ -161,6 +164,7 @@ void Street::startStreet() {
                     newCar.setDir(NORTH);
                     this->light->NorthSouthCarQueue->push(newCar);
                     spdlog::get("console")->info("[T1 South] New car pushed to queue from Client [T2 North]! " + tokens[i]);
+                    spdlog::get("file_logger")->info("[T1 South] New car pushed to queue from Client [T2 North]! " + tokens[i]);
                 }
 
                 count = 0;
@@ -171,6 +175,7 @@ void Street::startStreet() {
             try {
 
                 spdlog::get("console")->info("[T2 North] READING");
+                spdlog::get("file_logger")->info("[T2 North] READING");
                 string save = _read(t2NorthWriteSocket);
 
                 vector<string> tokens;
@@ -194,6 +199,7 @@ void Street::startStreet() {
                     newCar.setDir(SOUTH);
                     this->light->NorthSouthCarQueue->push(newCar);
                     spdlog::get("console")->info("[T2 North] New car pushed to queue from Client [T1 south]! " + tokens[i]);
+                    spdlog::get("file_logger")->info("[T2 North] New car pushed to queue from Client [T1 south]! " + tokens[i]);
                 }
                 count = 0;
             } catch (exception &e) {
@@ -238,6 +244,7 @@ void Street::startStreet() {
                             string carJSON = getJSON(NorthSouthNextCar).dump() + "\n";
 
                             spdlog::get("console")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON);
+                            spdlog::get("file_logger")->info("[T2 North] Sending to Server [T1 South] JSON: " + carJSON);
 
                             asio::write(t2NorthWriteSocket, asio::buffer(carJSON));
 
@@ -280,6 +287,7 @@ void Street::startStreet() {
                             string carJSON = getJSON(NorthSouthNextCar).dump() + "\n";
 
                             spdlog::get("console")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
+                            spdlog::get("file_logger")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
 
                             asio::write(t1SouthReadSocket, asio::buffer(carJSON));
 
@@ -315,7 +323,11 @@ void Street::startStreet() {
             }
             this_thread::sleep_for(chrono::milliseconds(nextCar.getSpeed()));
 
-            this->light->setNorth_south_timer(getTrafficTimer(carQueue->size()));
+            if (carQueue->size() < this->light->NorthSouthCarQueue->size()) {
+                this->light->setNorth_south_timer(getTrafficTimer(this->light->NorthSouthCarQueue->size()));
+            } else {
+                this->light->setNorth_south_timer(getTrafficTimer(carQueue->size()));
+            }
         }
     }
 }

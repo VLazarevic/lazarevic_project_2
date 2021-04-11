@@ -46,14 +46,14 @@ int main(int argc, char *argv[]) {
     TrafficLight *trafficLight2 = new TrafficLight("2", 0);
 
     //set the streets
-    Street *t1North = new Street(amount, trafficLight1, NORTH, carAmount, 47499, 47500);
+    Street *t1North = new Street(amount, trafficLight1, NORTH, carAmount, 0, 0);
     Street *t1East = new Street(amount, trafficLight1, EAST, carAmount, 0, 0);
     Street *t1South = new Street(amount, trafficLight1, SOUTH, carAmount, 47500, 47501);
     Street *t1West = new Street(amount, trafficLight1, WEST, carAmount, 0, 0);
 
     Street *t2North = new Street(amount, trafficLight2, NORTH, carAmount, 47501, 47500);
     Street *t2East = new Street(amount, trafficLight2, EAST, carAmount, 0, 0);
-    Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 47502, 47501);
+    Street *t2South = new Street(amount, trafficLight2, SOUTH, carAmount, 0, 0);
     Street *t2West = new Street(amount, trafficLight2, WEST, carAmount, 0, 0);
 
     //define the thread which is going to fill the queue
