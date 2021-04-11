@@ -141,6 +141,7 @@ void Street::startStreet() {
                 spdlog::get("console")->info("[T1 South] READING");
 
                 string save = _read(t1SouthReadSocket);
+
                 vector<string> tokens;
 
                 // stringstream class check1
@@ -158,10 +159,12 @@ void Street::startStreet() {
                     nlohmann::json carJSON = nlohmann::json::parse(tokens[i]);
                     Car newCar = buildFromJSON(carJSON);
                     newCar.setDir(NORTH);
-                    carQueue->push(newCar);
+                    this->light->NorthSouthCarQueue->push(newCar);
                     spdlog::get("console")->info("[T1 South] New car pushed to queue from Client [T2 North]! " + tokens[i]);
                 }
-            } catch (exception e) {
+
+                count = 0;
+            } catch (exception &e) {
                 spdlog::get("err_logger")->info("ERROR");
             }
         } if (port == 47501 && count > 0 && this->light->getNorthSouthColor() == GREEN) {
@@ -169,6 +172,7 @@ void Street::startStreet() {
 
                 spdlog::get("console")->info("[T2 North] READING");
                 string save = _read(t2NorthWriteSocket);
+
                 vector<string> tokens;
 
                 // stringstream class check1
@@ -191,7 +195,8 @@ void Street::startStreet() {
                     this->light->NorthSouthCarQueue->push(newCar);
                     spdlog::get("console")->info("[T2 North] New car pushed to queue from Client [T1 south]! " + tokens[i]);
                 }
-            } catch (exception e) {
+                count = 0;
+            } catch (exception &e) {
                 spdlog::get("err_logger")->info("ERROR");
             }
         }
@@ -247,6 +252,7 @@ void Street::startStreet() {
                                     style::reset);   
                         }
                         this->light->NorthSouthCarQueue->pop();
+                        
                     }
                 } else {
                     if (!carQueue->empty()) {
@@ -271,7 +277,7 @@ void Street::startStreet() {
                     if (!this->light->NorthSouthCarQueue->empty()) {
                         if (NorthSouthNextCar.getDir() == SOUTH) {
                             //t1 south to t2 north
-                            string carJSON = getJSON(nextCar).dump() + "\n";
+                            string carJSON = getJSON(NorthSouthNextCar).dump() + "\n";
 
                             spdlog::get("console")->info("[T1 South] Sending to Server [T2 North] JSON: " + carJSON);
 

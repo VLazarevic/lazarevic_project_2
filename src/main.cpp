@@ -57,17 +57,23 @@ int main(int argc, char *argv[]) {
     Street *t2West = new Street(amount, trafficLight2, WEST, carAmount, 0, 0);
 
     //define the thread which is going to fill the queue
+    bool firstFill = true;
+
     thread carFiller([&]() {
         while (true) {
-            t1North->fillCarQueue(carAmount);
-            t1East->fillCarQueue(carAmount);
+            t1North->fillCarQueue(firstFill ? carAmount : amount);
+            t1East->fillCarQueue(firstFill ? carAmount : amount);
             //t1South->fillCarQueue(1); //They cant get cars from anywhere else
-            t1West->fillCarQueue(carAmount);
+            t1West->fillCarQueue(firstFill ? carAmount : amount);
             //t2North->fillCarQueue(1); //They cant get cars from anywhere else
-            t2East->fillCarQueue(carAmount);
-            t2South->fillCarQueue(carAmount);
-            t2West->fillCarQueue(carAmount);
+            t2East->fillCarQueue(firstFill ? carAmount : amount);
+            t2South->fillCarQueue(firstFill ? carAmount : amount);
+            t2West->fillCarQueue(firstFill ? carAmount : amount);
             this_thread::sleep_for(chrono::milliseconds(respawnTime * 1000));
+
+            if(firstFill) {
+                firstFill = false;
+            }
         }
     });
 
